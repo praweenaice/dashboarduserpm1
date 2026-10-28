@@ -1,0 +1,3654 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PM1 Smart Dashboard · ระบบติดตามการดำเนินงานตามนโยบายรัฐบาลและข้อสั่งการนายกรัฐมนตรี</title>
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Sarabun', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    h1, h2, h3, h4, .font-heading {
+      font-family: 'Prompt', 'Sarabun', sans-serif;
+    }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: rgba(148, 163, 184, 0.1); }
+    ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.4); border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(100, 116, 139, 0.65); }
+
+    /* Sticky table columns */
+    .sticky-col-1 { position: sticky; left: 0; z-index: 10; }
+    .sticky-col-2 { position: sticky; left: 260px; z-index: 10; }
+
+    /* Print & PDF Export Styles */
+    @media print {
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        font-size: 11pt;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-only {
+        display: block !important;
+      }
+      .print-card {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: none !important;
+        background: #ffffff !important;
+        color: #0f172a !important;
+      }
+      .print-page-break {
+        page-break-before: always;
+        break-before: page;
+      }
+      .overflow-x-auto, .overflow-y-auto, .max-h-\[600px\] {
+        overflow: visible !important;
+        max-height: none !important;
+      }
+      .sticky-col-1, .sticky-col-2 {
+        position: static !important;
+      }
+      table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 9pt !important;
+      }
+      th, td {
+        border: 1px solid #cbd5e1 !important;
+        padding: 4px 6px !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased selection:bg-blue-600 selection:text-white min-h-screen flex flex-col">
+
+  <!-- PRINT HEADER BANNER (Visible only when printing / exporting PDF) -->
+  <div id="printHeaderBanner" class="hidden print-only mb-4 pb-3 border-b-2 border-slate-800">
+    <div class="flex items-center justify-between">
+      <div>
+        <div class="text-xs font-semibold uppercase tracking-wider text-blue-800">เอกสารรายงานผู้บริหาร · ระบบ PM1 (PMONE-1020)</div>
+        <h1 id="printReportTitle" class="text-xl font-bold text-slate-900 mt-0.5">รายงานสรุปผลการดำเนินงานตามนโยบายรัฐบาลและข้อสั่งการนายกรัฐมนตรี (PM1)</h1>
+        <p id="printReportSubtitle" class="text-xs text-slate-600 mt-0.5">ข้อมูลจำแนกตามรัฐบาล กระทรวง กรม และรายเดือน (กุมภาพันธ์ 2566 – ตุลาคม 2569)</p>
+      </div>
+      <div class="text-right text-xs text-slate-600">
+        <div id="printReportDate">วันที่พิมพ์: -</div>
+        <div id="printReportFilterSummary" class="font-medium text-slate-800 mt-0.5">เงื่อนไข: ทุกรัฐบาล | ทุกปี พ.ศ.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOP EXECUTIVE HEADER -->
+  <header class="bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 text-white shadow-lg no-print border-b border-blue-800/50">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-4">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div class="flex items-start sm:items-center gap-3.5">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-md shrink-0 text-slate-950 font-heading font-bold text-lg border border-amber-200/40">
+            PM1
+          </div>
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-400/20 text-amber-300 border border-amber-400/30">PMONE-1020 Analytics</span>
+              <span id="dataStatusBadge" class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">ข้อมูลพร้อมใช้งาน (5 รัฐบาล · 27 กระทรวง · 45 เดือน)</span>
+            </div>
+            <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white mt-1">
+              ระบบติดตามการดำเนินงานตามนโยบายรัฐบาลและข้อสั่งการนายกรัฐมนตรี (PM1)
+            </h1>
+            <p class="text-xs sm:text-sm text-blue-200/80">
+              Smart Executive Dashboard · วิเคราะห์เปรียบเทียบรายรัฐบาล เจาะลึกระดับกระทรวง/กรม และแนวโน้มรายเดือนแบบไดนามิก
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick Action Buttons -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button onclick="openImportModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm transition cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+            <span>Import ข้อมูลใหม่</span>
+          </button>
+          <button onclick="exportCurrentCSV()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium bg-white/10 hover:bg-white/20 text-white border border-white/15 transition cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>Export CSV</span>
+          </button>
+          <button onclick="openPrintModal()" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-sm transition cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            <span>พิมพ์ / Export PDF</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- NAVIGATION TABS + GLOBAL DYNAMIC FILTERS -->
+      <div class="mt-4 pt-3 border-t border-white/10 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
+        <!-- Main View Tabs -->
+        <nav class="flex flex-wrap gap-1.5" aria-label="Main Navigation">
+          <button onclick="switchTab('overview')" id="tabBtn-overview" class="tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-blue-600 text-white shadow-sm transition cursor-pointer">
+            1. ภาพรวมบริหาร (Executive Overview)
+          </button>
+          <button onclick="switchTab('govCompare')" id="tabBtn-govCompare" class="tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-blue-100 hover:bg-white/10 transition cursor-pointer">
+            2. เปรียบเทียบแต่ละรัฐบาล (Gov Comparison)
+          </button>
+          <button onclick="switchTab('ministryDrill')" id="tabBtn-ministryDrill" class="tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-blue-100 hover:bg-white/10 transition cursor-pointer">
+            3. เจาะลึกกระทรวง/กรม (Agency Drill-down)
+          </button>
+          <button onclick="switchTab('monthlyMatrix')" id="tabBtn-monthlyMatrix" class="tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-blue-100 hover:bg-white/10 transition cursor-pointer">
+            4. ตารางรายเดือนฉบับเต็ม (PMONE-1020 Matrix)
+          </button>
+          <button onclick="switchTab('dataManage')" id="tabBtn-dataManage" class="tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-blue-100 hover:bg-white/10 transition cursor-pointer">
+            5. จัดการ/นำเข้าข้อมูล (Data & Import)
+          </button>
+        </nav>
+
+        <!-- Global Filter Bar -->
+        <div class="flex flex-wrap items-center gap-2 bg-slate-950/50 p-2 rounded-xl border border-white/10">
+          <div class="flex items-center gap-1.5">
+            <label for="globalGovFilter" class="text-xs text-blue-200 font-medium whitespace-nowrap">รัฐบาล:</label>
+            <select id="globalGovFilter" onchange="onGlobalFilterChange()" class="bg-slate-800 text-white text-xs sm:text-sm rounded-lg px-2.5 py-1.5 border border-slate-600 focus:outline-none focus:border-amber-400">
+              <option value="ALL">ทุกรัฐบาล (รวมทั้งหมด)</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <label for="globalYearFilter" class="text-xs text-blue-200 font-medium whitespace-nowrap">ปี พ.ศ.:</label>
+            <select id="globalYearFilter" onchange="onGlobalFilterChange()" class="bg-slate-800 text-white text-xs sm:text-sm rounded-lg px-2.5 py-1.5 border border-slate-600 focus:outline-none focus:border-amber-400">
+              <option value="ALL">ทุกปี (2566–2569)</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <label for="globalMinistryFilter" class="text-xs text-blue-200 font-medium whitespace-nowrap">กระทรวง:</label>
+            <select id="globalMinistryFilter" onchange="onGlobalFilterChange()" class="bg-slate-800 text-white text-xs sm:text-sm rounded-lg px-2.5 py-1.5 border border-slate-600 max-w-[210px] truncate focus:outline-none focus:border-amber-400">
+              <option value="ALL">ทุกกระทรวง (27 หน่วยงานหลัก)</option>
+            </select>
+          </div>
+
+          <div class="relative">
+            <input id="globalSearchInput" type="text" oninput="onGlobalFilterChange()" placeholder="ค้นหากระทรวง / กรม..." class="bg-slate-800 text-white placeholder-slate-400 text-xs sm:text-sm rounded-lg pl-7 pr-2.5 py-1.5 border border-slate-600 w-40 sm:w-48 focus:outline-none focus:border-amber-400" />
+            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+
+          <button onclick="resetAllFilters()" title="ล้างตัวกรองทั้งหมด" class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 transition cursor-pointer">
+            รีเซ็ต
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-5 space-y-6">
+
+    <!-- EXECUTIVE KPI STRIP (Always visible across analytical tabs) -->
+    <section id="kpiStripSection" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3.5">
+      <!-- Populated dynamically by renderKPIStrip() -->
+    </section>
+
+    <!-- ==========================================
+         TAB 1: EXECUTIVE OVERVIEW
+         ========================================== -->
+    <section id="view-overview" class="space-y-6">
+      <!-- Smart Insights Banner -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 print-card">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+            <h2 class="text-base font-bold text-slate-900">บทวิเคราะห์อัจฉริยะสำหรับผู้บริหาร (Executive Smart Insights)</h2>
+          </div>
+          <span id="insightScopeLabel" class="text-xs font-medium text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">ขอบเขตข้อมูล: ทุกรัฐบาล · ทุกปี พ.ศ.</span>
+        </div>
+        <div id="smartInsightsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3.5">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Monthly Timeline Chart (Full Width) -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 print-card">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">แนวโน้มความถี่การรายงานผลนโยบายรายเดือน (ก.พ. 2566 – ต.ค. 2569)</h2>
+            <p class="text-xs text-slate-500">แสดงจังหวะการรายงานผลนโยบายและข้อสั่งการนายกรัฐมนตรี แยกตามช่วงเวลาและรัฐบาล (คลิกที่แท่งเดือนเพื่อดูรายละเอียด)</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-1.5 no-print">
+            <button onclick="setTimelineMode('stackedGov')" id="tlMode-stackedGov" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition cursor-pointer">แยกสีตามรัฐบาล (Stacked)</button>
+            <button onclick="setTimelineMode('totalTrend')" id="tlMode-totalTrend" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">เส้นแนวโน้มรวม (Trend)</button>
+            <button onclick="setTimelineMode('cumulative')" id="tlMode-cumulative" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer">ยอดสะสม (Cumulative)</button>
+          </div>
+        </div>
+        <div id="timelineChartLegend" class="flex flex-wrap items-center gap-4 mb-3 text-xs"></div>
+        <div id="timelineChartContainer" class="w-full overflow-x-auto pb-2"></div>
+      </div>
+
+      <!-- 2-Column Grid: Top Ministries Ranking & Government Share Breakdown -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left 7 cols: Top Ministries Ranking -->
+        <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 print-card">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+            <div>
+              <h2 class="text-base font-bold text-slate-900">จัดอันดับกระทรวงที่มีการรายงานผลสูงสุด (คลิกเพื่อเจาะลึกระดับกรม)</h2>
+              <p class="text-xs text-slate-500">เปรียบเทียบจำนวนครั้งที่รายงาน จำนวนนโยบาย และอัตราความถี่เฉลี่ย (ครั้ง/นโยบาย)</p>
+            </div>
+            <div class="flex items-center gap-1.5 no-print">
+              <select id="ministryRankMetric" onchange="renderOverviewCharts()" class="text-xs bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium text-slate-800">
+                <option value="reports">เรียงตาม: รวมครั้งที่รายงาน</option>
+                <option value="policies">เรียงตาม: จำนวนนโยบาย</option>
+                <option value="intensity">เรียงตาม: ความถี่ (ครั้ง/นโยบาย)</option>
+              </select>
+              <select id="ministryRankLimit" onchange="renderOverviewCharts()" class="text-xs bg-slate-100 border border-slate-300 rounded-lg px-2.5 py-1.5 font-medium text-slate-800">
+                <option value="12">Top 12</option>
+                <option value="20">Top 20</option>
+                <option value="999">ทั้งหมด (27)</option>
+              </select>
+            </div>
+          </div>
+          <div id="ministryRankingChart" class="space-y-2.5"></div>
+        </div>
+
+        <!-- Right 5 cols: Government Share & Yearly Distribution -->
+        <div class="lg:col-span-5 space-y-6">
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 print-card">
+            <div class="flex items-center justify-between mb-3">
+              <div>
+                <h2 class="text-base font-bold text-slate-900">สัดส่วนการรายงานผลแยกตามรัฐบาล</h2>
+                <p class="text-xs text-slate-500">เปรียบเทียบจำนวนครั้งที่รายงานและจำนวนนโยบายของแต่ละรัฐบาล</p>
+              </div>
+              <button onclick="switchTab('govCompare')" class="text-xs font-semibold text-blue-600 hover:underline no-print cursor-pointer">ดูเปรียบเทียบละเอียด →</button>
+            </div>
+            <div id="govShareOverviewWidget" class="space-y-3"></div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 print-card">
+            <h2 class="text-base font-bold text-slate-900 mb-1">สรุปความถี่การรายงานแยกตามปี พ.ศ. (2566 – 2569)</h2>
+            <p class="text-xs text-slate-500 mb-3">เปรียบเทียบปริมาณการรายงานผลและค่าเฉลี่ยต่อเดือนในแต่ละปี พ.ศ.</p>
+            <div id="yearlyBreakdownWidget" class="space-y-2.5"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 2: CROSS-GOVERNMENT COMPARISON
+         ========================================== -->
+    <section id="view-govCompare" class="hidden space-y-6">
+      <!-- 5 Government Scorecards -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 print-card">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">การ์ดเปรียบเทียบผลการดำเนินงานแยกตามรัฐบาล (Executive Government Scorecards)</h2>
+            <p class="text-xs text-slate-500">วิเคราะห์เปรียบเทียบจำนวนนโยบาย จำนวนครั้งที่รายงาน ความถี่ต่อนโยบาย อัตราการรายงานต่อเดือน และหน่วยงานหลักของแต่ละรัฐบาล</p>
+          </div>
+        </div>
+        <div id="govScorecardsGrid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4"></div>
+      </div>
+
+      <!-- Head-to-Head Comparator (Gov A vs Gov B) -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 print-card">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 pb-4 border-b border-slate-200">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-indigo-600">Interactive Comparator</span>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">เปรียบเทียบตัวต่อตัวระหว่าง 2 รัฐบาล (Head-to-Head Analysis)</h2>
+            <p class="text-xs text-slate-500">เลือก 2 รัฐบาลเพื่อวิเคราะห์ผลต่าง (Delta) ของจำนวนครั้งที่รายงานและจำนวนนโยบายในแต่ละกระทรวง</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 no-print">
+            <select id="h2hGovA" onchange="renderHeadToHead()" class="text-xs sm:text-sm bg-blue-50 border border-blue-300 text-blue-900 font-semibold rounded-lg px-3 py-1.5"></select>
+            <span class="text-xs font-bold text-slate-500 px-1">VS</span>
+            <select id="h2hGovB" onchange="renderHeadToHead()" class="text-xs sm:text-sm bg-amber-50 border border-amber-300 text-amber-900 font-semibold rounded-lg px-3 py-1.5"></select>
+          </div>
+        </div>
+        <div id="headToHeadContainer" class="mt-4"></div>
+      </div>
+
+      <!-- Full Ministry x Government Heatmap Matrix -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 print-card">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+          <div>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">ตารางเปรียบเทียบจำนวนครั้งที่รายงานผลนโยบาย แยกตามกระทรวงและรัฐบาล (Heatmap Matrix)</h2>
+            <p class="text-xs text-slate-500">อ้างอิงฐานข้อมูล PMONE-1020 เปรียบเทียบครบทั้ง 27 กระทรวง/หน่วยงานหลัก ข้ามทุกรัฐบาล</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 no-print">
+            <select id="govMatrixDisplayMode" onchange="renderGovComparisonMatrix()" class="text-xs bg-slate-100 border border-slate-300 rounded-lg px-3 py-1.5 font-medium text-slate-800">
+              <option value="count">แสดง: จำนวนครั้งที่รายงาน (ครั้ง)</option>
+              <option value="rowPct">แสดง: สัดส่วน % ภายในกระทรวง (Row %)</option>
+              <option value="colPct">แสดง: สัดส่วน % ภายในรัฐบาล (Column %)</option>
+              <option value="policies">แสดง: จำนวนนโยบาย (นโยบาย)</option>
+            </select>
+          </div>
+        </div>
+        <div id="govComparisonMatrixContainer" class="overflow-x-auto"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 3: MINISTRY & DEPARTMENT DRILL-DOWN
+         ========================================== -->
+    <section id="view-ministryDrill" class="hidden space-y-6">
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 print-card">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pb-4 border-b border-slate-200">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-emerald-600">Deep-Dive Agency Explorer</span>
+            <h2 class="text-base sm:text-lg font-bold text-slate-900">เจาะลึกระดับกระทรวงและกรม/หน่วยงานในสังกัด</h2>
+            <p class="text-xs text-slate-500">วิเคราะห์สัดส่วนการรายงานของกรมย่อยเทียบกับระดับกระทรวง และแนวโน้มรายเดือนของแต่ละหน่วยงาน</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 no-print">
+            <label for="drillMinistrySelect" class="text-xs font-semibold text-slate-700">เลือกกระทรวงหลัก:</label>
+            <select id="drillMinistrySelect" onchange="onDrillMinistrySelect(this.value)" class="text-xs sm:text-sm bg-slate-100 border border-slate-300 rounded-lg px-3 py-2 font-semibold text-slate-900 min-w-[260px]"></select>
+          </div>
+        </div>
+
+        <div id="ministryDrillContent" class="mt-4 space-y-6"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 4: FULL MONTHLY MATRIX (PMONE-1020)
+         ========================================== -->
+    <section id="view-monthlyMatrix" class="hidden space-y-4">
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-4 sm:p-5 print-card">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 mb-4">
+          <div>
+            <h2 id="matrixTableHeading" class="text-base sm:text-lg font-bold text-slate-900">ตารางจำนวนครั้งที่หน่วยงานรายงานผลนโยบายรัฐบาล แยกกระทรวง/กรม รายเดือน</h2>
+            <p class="text-xs text-slate-500">คลิกที่ชื่อกระทรวงเพื่อ ยุบ/ขยาย กรมในสังกัด หรือคลิกปุ่มกราฟท้ายแถวเพื่อดูกราฟแนวโน้มรายหน่วยงาน</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 no-print">
+            <button onclick="toggleAllMatrixMinistries(true)" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer">
+              ขยายกรมทั้งหมด
+            </button>
+            <button onclick="toggleAllMatrixMinistries(false)" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer">
+              ยุบเหลือเฉพาะกระทรวง
+            </button>
+            <label class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg cursor-pointer">
+              <input type="checkbox" id="matrixHeatmapToggle" checked onchange="renderMonthlyMatrixTable()" class="rounded text-blue-600" />
+              <span>แสดงสี Heatmap</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="monthlyMatrixTableWrapper" class="overflow-x-auto max-h-[680px] border border-slate-200 rounded-lg"></div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         TAB 5: DATA IMPORT & MANAGEMENT
+         ========================================== -->
+    <section id="view-dataManage" class="hidden space-y-6 no-print">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left 7 cols: CSV / Raw Text Import -->
+        <div class="lg:col-span-7 bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div>
+              <span class="text-xs font-semibold uppercase tracking-wider text-emerald-600">Future-Proof Data Pipeline</span>
+              <h2 class="text-lg font-bold text-slate-900">นำเข้าข้อมูลใหม่จากระบบ PM1 (CSV / Excel / Text / JSON)</h2>
+              <p class="text-xs text-slate-500">รองรับไฟล์รายงาน PMONE-1020 ทั้งแบบรวมทุกรัฐบาล หรือแบบแยกเฉพาะรัฐบาลใหม่ในอนาคต</p>
+            </div>
+            <button onclick="downloadSampleTemplate()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200 transition cursor-pointer">
+              ดาวน์โหลดไฟล์ตัวอย่าง CSV
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">โหมดการนำเข้าข้อมูล:</label>
+              <select id="importModeSelect" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 font-medium text-slate-800">
+                <option value="auto">อัตโนมัติ (ตรวจจับรูปแบบ PMONE-1020 / รัฐบาลใหม่)</option>
+                <option value="mergeGov">เพิ่มหรืออัปเดตเฉพาะรัฐบาลที่ระบุ (Merge Government)</option>
+                <option value="replaceAll">แทนที่ข้อมูลทั้งหมดด้วยไฟล์ใหม่ (Replace All)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อรัฐบาล (กรณีนำเข้าตารางเดี่ยว/รัฐบาลใหม่):</label>
+              <input id="importCustomGovName" type="text" placeholder="เช่น รัฐบาลใหม่ (2570) หรือเว้นว่างเพื่ออ่านจากหัวตาราง" class="w-full text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800" />
+            </div>
+          </div>
+
+          <!-- File Dropzone -->
+          <div class="border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-5 text-center bg-slate-50/70 transition">
+            <input type="file" id="csvFileInput" accept=".csv,.tsv,.txt,.json" onchange="handleFileSelect(event)" class="hidden" />
+            <label for="csvFileInput" class="cursor-pointer flex flex-col items-center">
+              <svg class="w-9 h-9 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+              <span class="text-sm font-semibold text-slate-800">คลิกเพื่อเลือกไฟล์ .CSV, .TXT หรือ .JSON</span>
+              <span class="text-xs text-slate-500 mt-0.5">หรือคัดลอกข้อมูลจาก Excel / PMONE-1020 มาวางในช่องด้านล่าง</span>
+            </label>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">วางข้อมูล CSV / ข้อความจากรายงาน PMONE-1020 โดยตรง:</label>
+            <textarea id="rawPasteInput" rows="7" placeholder="วางข้อมูล CSV ที่คัดลอกจากระบบ PM1 ที่นี่..." class="w-full font-mono text-xs bg-slate-900 text-emerald-300 rounded-xl p-3 border border-slate-700 focus:outline-none focus:border-blue-500"></textarea>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
+            <div id="importFeedbackMsg" class="text-xs font-medium text-slate-600">พร้อมรับข้อมูลใหม่</div>
+            <div class="flex items-center gap-2">
+              <button onclick="loadDemoFutureGov()" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 transition cursor-pointer">
+                ทดลองจำลองข้อมูลปี 2570
+              </button>
+              <button onclick="processRawImport()" class="px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm transition cursor-pointer">
+                ประมวลผลและนำเข้าข้อมูล
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right 5 cols: Quick Manual Entry & Storage Backup -->
+        <div class="lg:col-span-5 space-y-6">
+          <!-- Quick Entry Form -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-3.5">
+            <h3 class="text-base font-bold text-slate-900">บันทึก/แก้ไขข้อมูลรายเดือนแบบรวดเร็ว (Quick Data Entry)</h3>
+            <p class="text-xs text-slate-500">เพิ่มยอดการรายงานของหน่วยงานในเดือนใหม่ หรือปรับปรุงตัวเลขรายเดือนได้ทันที</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">รัฐบาล:</label>
+                <input id="qeGovInput" list="qeGovList" type="text" placeholder="เลือกหรือพิมพ์ชื่อรัฐบาลใหม่" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2" />
+                <datalist id="qeGovList"></datalist>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">กระทรวงหลัก:</label>
+                <input id="qeMinistryInput" list="qeMinistryList" type="text" placeholder="เลือกหรือพิมพ์ชื่อกระทรวง" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2" />
+                <datalist id="qeMinistryList"></datalist>
+              </div>
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-medium text-slate-700 mb-1">กรม / หน่วยงานย่อย:</label>
+                <input id="qeDeptInput" type="text" value="(ระดับกระทรวง/หน่วยงานหลักเอง)" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">ปี พ.ศ. (เช่น 2569, 2570):</label>
+                <input id="qeYearInput" type="number" value="2569" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">เดือน:</label>
+                <select id="qeMonthInput" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2">
+                  <option value="มกราคม">มกราคม</option>
+                  <option value="กุมภาพันธ์">กุมภาพันธ์</option>
+                  <option value="มีนาคม">มีนาคม</option>
+                  <option value="เมษายน">เมษายน</option>
+                  <option value="พฤษภาคม">พฤษภาคม</option>
+                  <option value="มิถุนายน">มิถุนายน</option>
+                  <option value="กรกฎาคม">กรกฎาคม</option>
+                  <option value="สิงหาคม">สิงหาคม</option>
+                  <option value="กันยายน">กันยายน</option>
+                  <option value="ตุลาคม">ตุลาคม</option>
+                  <option value="พฤศจิกายน" selected>พฤศจิกายน</option>
+                  <option value="ธันวาคม">ธันวาคม</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">จำนวนครั้งที่รายงานในเดือนนี้:</label>
+                <input id="qeReportsInput" type="number" value="25" min="0" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-slate-700 mb-1">จำนวนนโยบายที่เพิ่ม (ถ้ามี):</label>
+                <input id="qePoliciesInput" type="number" value="5" min="0" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-2" />
+              </div>
+            </div>
+
+            <button onclick="submitQuickEntry()" class="w-full py-2 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white transition cursor-pointer">
+              + บันทึกข้อมูลลงระบบทันที
+            </button>
+          </div>
+
+          <!-- Database Backup & Reset -->
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 space-y-3">
+            <h3 class="text-base font-bold text-slate-900">สถานะฐานข้อมูลและการสำรองข้อมูล (LocalStorage & Backup)</h3>
+            <p id="storageSummaryText" class="text-xs text-slate-600">ข้อมูลถูกบันทึกอัตโนมัติในเบราว์เซอร์ของคุณ สามารถสำรองเป็นไฟล์ JSON หรือคืนค่าเริ่มต้นได้</p>
+            <div class="flex flex-wrap gap-2 pt-1">
+              <button onclick="exportFullJSON()" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-white transition cursor-pointer">
+                ดาวน์โหลด Backup (.JSON)
+              </button>
+              <button onclick="resetToFactoryData()" class="px-3.5 py-2 rounded-lg text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition cursor-pointer">
+                คืนค่าข้อมูลตั้งต้น (PMONE-1020 เดิม)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEDICATED EXECUTIVE PRINT REPORT SECTION (Populated when printing custom PDF report) -->
+    <section id="executivePrintReportSection" class="hidden print-only space-y-6"></section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 mt-8 py-4 px-4 sm:px-6 text-xs text-slate-500 no-print">
+    <div class="max-w-[1600px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>ระบบติดตามการดำเนินงานตามนโยบายรัฐบาลและข้อสั่งการนายกรัฐมนตรี (PM1) · รหัสรายงาน <strong>PMONE-1020</strong></div>
+      <div>รองรับการนำเข้าข้อมูลรายเดือน (Import CSV/JSON) และการพิมพ์รายงานผู้บริหาร (Print / Save as PDF)</div>
+    </div>
+  </footer>
+
+  <!-- ==========================================
+       MODAL 1: AGENCY DEEP-DIVE MODAL
+       ========================================== -->
+  <div id="agencyModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+      <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <div>
+          <span id="modalAgencyTypeBadge" class="text-xs font-semibold px-2 py-0.5 rounded bg-amber-400/20 text-amber-300">รายละเอียดหน่วยงาน</span>
+          <h3 id="modalAgencyTitle" class="text-lg font-bold mt-0.5">ชื่อหน่วยงาน</h3>
+        </div>
+        <button onclick="closeAgencyModal()" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white cursor-pointer">✕</button>
+      </div>
+      <div id="modalAgencyBody" class="p-5 overflow-y-auto space-y-5"></div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       MODAL 2: PRINT & PDF EXPORT STUDIO MODAL
+       ========================================== -->
+  <div id="printModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden items-center justify-center p-4 no-print">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-lg w-full overflow-hidden">
+      <div class="px-5 py-4 bg-slate-900 text-white flex items-center justify-between">
+        <div>
+          <span class="text-xs font-semibold text-amber-300 uppercase">Print & Export to PDF Studio</span>
+          <h3 class="text-base font-bold mt-0.5">ตั้งค่าการพิมพ์และส่งออกรายงาน PDF</h3>
+        </div>
+        <button onclick="closePrintModal()" class="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white cursor-pointer">✕</button>
+      </div>
+      <div class="p-5 space-y-4 text-xs sm:text-sm">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">ชื่อหัวข้อรายงานบนเอกสาร PDF:</label>
+          <input id="pdfTitleInput" type="text" value="รายงานสรุปผลการดำเนินงานตามนโยบายรัฐบาลและข้อสั่งการนายกรัฐมนตรี (PM1)" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs sm:text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">รูปแบบเนื้อหาที่ต้องการพิมพ์ / Export PDF:</label>
+          <select id="pdfContentMode" class="w-full border border-slate-300 rounded-lg px-3 py-2 text-xs sm:text-sm font-medium">
+            <option value="executivePack">ชุดรายงานสรุปผู้บริหารครบวงจร (KPI + เปรียบเทียบ 5 รัฐบาล + จัดอันดับ 27 กระทรวง)</option>
+            <option value="currentTab">เฉพาะหน้ามุมมองที่กำลังเปิดอยู่ปัจจุบัน (Current Active View)</option>
+            <option value="fullMinistryDept">ชุดรายงานเจาะลึกทุกกระทรวงและกรมย่อยตามตัวกรองปัจจุบัน</option>
+          </select>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 text-xs text-blue-900 space-y-1">
+          <div class="font-semibold">คำแนะนำสำหรับการบันทึกเป็นไฟล์ PDF:</div>
+          <div>เมื่อหน้าต่างพิมพ์เปิดขึ้น ให้เลือก Destination (เครื่องพิมพ์) เป็น <strong>"Save as PDF" (บันทึกเป็น PDF)</strong> และแนะนำให้เลือกกระดาษแนวนอน (Landscape) เพื่อความสวยงามของตารางรายเดือน</div>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+          <button onclick="closePrintModal()" class="px-4 py-2 rounded-lg text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 cursor-pointer">ยกเลิก</button>
+          <button onclick="executePrintReport()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-sm cursor-pointer">
+            เปิดหน้าต่างพิมพ์ / Save as PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // =========================================================================
+    // 1. EMBEDDED FACTORY DATASET (PMONE-1020 FULL RAW CSV)
+    // =========================================================================
+    const FACTORY_RAW_CSV = `PMONE-1020 · จำนวนครั้งที่หน่วยงานรายงานผลนโยบายรัฐบาล แยกกระทรวง/กรม รายเดือน · ทุกรัฐบาล,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+กระทรวง / กรม,จำนวนนโยบาย/ข้อสั่งการที่รายงาน,รวมครั้งที่รายงาน,2566,,,,,,,,,,,2567,,,,,,,,,,,,2568,,,,,,,,,,,,2569,,,,,,,,,
+,,,กุมภาพันธ์,มีนาคม,เมษายน,พฤษภาคม,มิถุนายน,กรกฎาคม,สิงหาคม,กันยายน,ตุลาคม,พฤศจิกายน,ธันวาคม,มกราคม,กุมภาพันธ์,มีนาคม,เมษายน,พฤษภาคม,มิถุนายน,กรกฎาคม,สิงหาคม,กันยายน,ตุลาคม,พฤศจิกายน,ธันวาคม,มกราคม,กุมภาพันธ์,มีนาคม,เมษายน,พฤษภาคม,มิถุนายน,กรกฎาคม,สิงหาคม,กันยายน,ตุลาคม,พฤศจิกายน,ธันวาคม,มกราคม,กุมภาพันธ์,มีนาคม,เมษายน,พฤษภาคม,มิถุนายน,กรกฎาคม,สิงหาคม,กันยายน,ตุลาคม
+สำนักนายกรัฐมนตรี,980,2043,,5,,4,3,26,165,510,310,8,,,,1,1,2,10,37,27,29,23,10,8,16,172,51,36,64,41,57,49,38,33,2,18,53,35,,,1,,2,94,52,50
+สำนักเลขาธิการนายกรัฐมนตรี,441,1180,,,,,,23,160,503,310,8,,,,1,1,2,10,,,,,,,10,145,,1,,1,2,,,,,,,,,,1,,2,,,
+สำนักงานคณะกรรมการนโยบายที่ดินแห่งชาติ,106,212,,,,,,,,,,,,,,,,,,15,13,12,11,9,8,4,13,11,9,10,8,15,15,9,6,,,19,7,,,,,,6,6,6
+สำนักงานส่งเสริมวิสาหกิจขนาดกลางและขนาดย่อม,79,114,,2,,,,,,,,,,,,,,,,,,,,,,,,,,24,12,12,12,12,12,,,,,,,,,,,24,4
+สถาบันคุณวุฒิวิชาชีพ (องค์การมหาชน),74,74,,,,,,,,,,,,,,,,,,,,,,,,,8,8,8,8,8,8,8,8,7,,,,,,,,,,1,1,1
+สำนักงานสภาความมั่นคงแห่งชาติ,47,66,,,,,,,,,,,,,,,,,,14,11,10,8,,,,,,,5,,,,,,,,6,4,,,,,,,4,4
+สำนักงานปลัดสำนักนายกรัฐมนตรี,48,62,,3,,4,3,3,3,,,,,,,,,,,6,2,2,,,,,,9,,,,,,,,,5,12,3,,,,,,3,2,2
+สำนักงานคณะกรรมการส่งเสริมการลงทุน,47,47,,,,,,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,30,,15
+สำนักงานคณะกรรมการพัฒนาระบบราชการ,33,45,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,12,,,,,,,28,4,
+กรุงเทพมหานคร,37,42,,,,,,,,1,,,,,,,,,,1,,,,,,,2,1,6,,2,,2,4,2,2,1,,9,,,,,,4,3,2
+สำนักงบประมาณ,38,39,,,,,,,,,,,,,,,,,,,,4,3,1,,2,,6,3,4,3,3,3,2,,,,,,,,,,,,2,3
+สำนักงานคณะกรรมการกฤษฎีกา,29,39,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,9,3,,,,11,,,,,,,,16,,
+สำนักงานพัฒนารัฐบาลดิจิทัล (องค์การมหาชน),36,38,,,,,,,,,,,,,,,,,,1,1,1,1,,,,2,2,2,2,2,4,2,2,2,,,,4,,,,,,,,10
+สำนักงานคณะกรรมการข้าราชการพลเรือน,18,23,,,,,,,,,,,,,,,,,,,,,,,,,1,3,1,,,,,,,,,1,2,,,,,,6,6,3
+สำนักงานคณะกรรมการการรักษาความมั่นคงปลอดภัยไซเบอร์แห่งชาติ,17,22,,,,,,,,,,,,,,,,,,,,,,,,,,,,4,1,1,2,,4,,1,3,6,,,,,,,,
+สำนักงานสภาพัฒนาการเศรษฐกิจและสังคมแห่งชาติ,14,16,,,,,,,,,,,,,,,,,,,,,,,,,,9,4,2,,,,1,,,,,,,,,,,,,
+กรมประชาสัมพันธ์,11,11,,,,,,,,,,,,,,,,,,,,,,,,,1,1,1,2,2,2,2,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),1,6,,,,,,,,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+สำนักงานทรัพยากรน้ำแห่งชาติ,5,5,,,,,,,,,,,,,,,,,,,,,,,,,,1,1,3,,,,,,,,,,,,,,,,,
+สำนักงานบริหารและพัฒนาองค์ความรู้ (องค์การมหาชน),1,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,2,,,,,,,,,,,,,,,,
+กระทรวงทรัพยากรธรรมชาติและสิ่งแวดล้อม,472,1649,,,,,133,13,78,66,,,,,,,,,,49,73,73,55,40,,,68,129,98,101,101,88,95,93,,,16,87,,,,,,,77,94,22
+(ระดับกระทรวง/หน่วยงานหลักเอง),472,1649,,,,,133,13,78,66,,,,,,,,,,49,73,73,55,40,,,68,129,98,101,101,88,95,93,,,16,87,,,,,,,77,94,22
+กระทรวงแรงงาน,403,1261,,14,89,87,87,88,87,77,11,,,,,,,,,49,51,51,51,,,,,,,,,,33,124,140,,,,,,,,,,,185,37
+(ระดับกระทรวง/หน่วยงานหลักเอง),403,1261,,14,89,87,87,88,87,77,11,,,,,,,,,49,51,51,51,,,,,,,,,,33,124,140,,,,,,,,,,,185,37
+กระทรวงเกษตรและสหกรณ์,337,1208,,,,134,104,59,81,10,,,,,,,78,,23,12,29,16,,,,12,48,38,84,26,91,82,13,132,85,,,8,,,,,,3,31,5,4
+(ระดับกระทรวง/หน่วยงานหลักเอง),331,1198,,,,134,104,59,81,10,,,,,,,78,,23,12,29,16,,,,12,48,38,84,26,91,82,13,132,85,,,3,,,,,,,31,5,2
+กรมชลประทาน,3,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,3,,,,,,,,,
+กรมประมง,2,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,2,,,,,,,,,1
+การยางแห่งประเทศไทย,1,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,3,,,
+กรมส่งเสริมการเกษตร,1,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1
+กระทรวงอุตสาหกรรม,390,821,,,,1,47,47,12,,47,,,,,,,,,18,,37,10,3,,,,43,55,41,43,55,28,48,41,,,21,49,,,,,2,103,,70
+(ระดับกระทรวง/หน่วยงานหลักเอง),329,682,,,,1,47,47,12,,47,,,,,,,,,18,,37,10,3,,,,43,55,41,43,55,28,48,41,,,5,3,,,,,2,95,,1
+กรมส่งเสริมอุตสาหกรรม,37,68,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,7,25,,,,,,,,36
+กรมโรงงานอุตสาหกรรม,10,22,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,6,,,,,,1,,15
+การนิคมอุตสาหกรรมแห่งประเทศไทย,20,20,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,5,,,,,,7,,8
+สำนักงานเศรษฐกิจอุตสาหกรรม,9,10,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,6,,,,,,,,3
+กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่,6,9,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,3,3,,,,,,,,3
+สำนักงานมาตรฐานผลิตภัณฑ์อุตสาหกรรม,7,7,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,4,1,,,,,,,,2
+สำนักงานคณะกรรมการอ้อยและน้ำตาลทราย,3,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,,,2
+กระทรวงดิจิทัลเพื่อเศรษฐกิจและสังคม,363,815,20,8,106,49,46,43,51,19,,,,,,,,,,,,,,,,,,52,47,45,31,32,20,22,,,,33,,,,,,,66,63,62
+(ระดับกระทรวง/หน่วยงานหลักเอง),352,796,1,8,106,49,46,43,51,19,,,,,,,,,,,,,,,,,,52,47,45,31,32,20,22,,,,33,,,,,,,66,63,62
+สำนักงานส่งเสริมเศรษฐกิจดิจิทัล,11,19,19,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+กระทรวงยุติธรรม,299,737,,,5,22,,27,22,,,,,,,,,,,,61,,,,,,,1,90,12,61,105,74,22,104,,1,,42,,,,,,,72,16
+(ระดับกระทรวง/หน่วยงานหลักเอง),258,621,,,5,22,,27,22,,,,,,,,,,,,61,,,,,,,1,90,12,61,105,74,22,104,,1,,3,,,,,,,7,4
+กรมคุมประพฤติ,22,36,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,16,,,,,,,20,
+กรมราชทัณฑ์,11,30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,12,,,,,,,12,6
+กรมสอบสวนคดีพิเศษ,16,17,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,2,,,,,,,12,3
+กรมบังคับคดี,7,11,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,6,,,,,,,4,1
+กรมคุ้มครองสิทธิและเสรีภาพ,4,10,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,10,
+กรมพินิจและคุ้มครองเด็กและเยาวชน,8,8,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,2,,,,,,,4,2
+สำนักงานกิจการยุติธรรม,4,4,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,3,
+กระทรวงคมนาคม,131,673,7,,18,,,,27,2,,,,,,,,,,7,15,17,51,20,25,34,7,52,18,69,38,16,22,51,2,,3,38,28,,,,,,23,18,65
+(ระดับกระทรวง/หน่วยงานหลักเอง),89,499,7,,18,,,,27,2,,,,,,,,,,7,15,17,51,20,25,34,7,52,18,69,38,16,22,51,2,,,1,,,,,,,,,
+การรถไฟฟ้าขนส่งมวลชนแห่งประเทศไทย (รฟม.),30,44,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,12,4,,,,,,11,6,11
+สำนักงานนโยบายและแผนการขนส่งและจราจร,27,35,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,6,2,,,,,,10,7,10
+กรมการขนส่งทางบก (ขบ.),16,26,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,4,7,,,,,,1,1,13
+กรมเจ้าท่า (จท.),10,20,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,8,,,,,,,,12
+การท่าเรือแห่งประเทศไทย (กทท.),16,19,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,3,,1,,,,,,,1,14
+กรมท่าอากาศยาน,5,17,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,13,4,,,,,,,,
+กรมการขนส่งทางราง (ขร.),3,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,1,,,,,,,,1
+บริษัท ขนส่ง จำกัด (บขส.),3,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,2
+บริษัท วิทยุการบินแห่งประเทศไทย จำกัด,3,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,1,1
+บริษัท ท่าอากาศยานไทย จำกัด (มหาชน),1,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,1,,,,,,,,
+องค์การขนส่งมวลชนกรุงเทพ (ขสมก.),1,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,
+กรมทางหลวง,1,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1
+กระทรวงมหาดไทย,302,542,,1,7,1,13,1,,,,,,,,,,,,,21,3,1,,2,,,20,27,16,4,49,26,16,,,,135,5,,,,,28,117,23,26
+(ระดับกระทรวง/หน่วยงานหลักเอง),302,542,,1,7,1,13,1,,,,,,,,,,,,,21,3,1,,2,,,20,27,16,4,49,26,16,,,,135,5,,,,,28,117,23,26
+กระทรวงสาธารณสุข,158,540,,20,34,5,5,71,21,,,,,,,,,,,30,24,24,23,,,,30,28,25,28,28,27,34,,,,,,31,,,,,,23,21,8
+(ระดับกระทรวง/หน่วยงานหลักเอง),158,539,,20,34,5,5,71,21,,,,,,,,,,,30,24,24,23,,,,30,28,25,28,28,27,34,,,,,,31,,,,,,22,21,8
+สำนักงานหลักประกันสุขภาพแห่งชาติ,1,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,
+กระทรวงพาณิชย์,274,477,,,,4,19,7,25,15,,,,,,,,,,15,12,13,30,,,,,14,14,14,13,11,15,13,,,,9,9,,,,,,103,62,60
+(ระดับกระทรวง/หน่วยงานหลักเอง),242,296,,,,4,19,7,25,15,,,,,,,,,,15,12,13,30,,,,,14,14,14,13,11,15,13,,,,9,9,,,,,,,21,23
+กรมการค้าภายใน,28,64,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,51,7,6
+กรมพัฒนาธุรกิจการค้า,21,26,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,9,9,8
+กรมการค้าต่างประเทศ,16,22,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,9,8,5
+สถาบันวิจัยและพัฒนาอัญมณีและเครื่องประดับแห่งชาติ (องค์การมหาชน),9,19,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,6,7,6
+กรมส่งเสริมการค้าระหว่างประเทศ,18,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,6,6,6
+สำนักงานนโยบายและยุทธศาสตร์การค้า,6,13,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,5,4,4
+กรมทรัพย์สินทางปัญญา,5,9,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,9,,
+กรมเจรจาการค้าระหว่างประเทศ,7,7,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,5,,2
+สถาบันระหว่างประเทศเพื่อการค้าและการพัฒนา (องค์การมหาชน),2,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,2,,
+สถาบันส่งเสริมศิลปหัตถกรรมไทย (องค์การมหาชน),1,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,
+กระทรวงการคลัง,252,447,,,18,11,19,14,13,,,,,,,,,,,,,,5,,,,,,1,60,10,23,29,,,,17,49,6,,,,,1,50,86,35
+(ระดับกระทรวง/หน่วยงานหลักเอง),137,203,,,18,11,19,14,13,,,,,,,,,,,,,,5,,,,,,1,60,9,23,29,,,,,,,,,,,1,,,
+ธนาคารออมสิน,16,40,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,12,,,,,,,,16,11
+บริษัทประกันสินเชื่ออุตสาหกรรมขนาดย่อม,22,33,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,5,3,,,,,,,19,6,
+สำนักงานเศรษฐกิจการคลัง,27,31,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,6,,,,,,,1,17,7
+กรมสรรพสามิต,13,25,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,16,5,4
+สำนักงานคณะกรรมการนโยบายรัฐวิสาหกิจ,18,21,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,9,6,,,,,,,,5,1
+ธนาคารเพื่อการส่งออกและนำเข้าแห่งประเทศไทย,10,20,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,5,2,,,,,,2,8,2
+ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร,14,14,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,4,,,,,,,6,2,2
+ธนาคารแห่งประเทศไทย,11,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,2,,,,,,,1,5,3
+กองทุนเงินให้กู้ยืมเพื่อการศึกษา,12,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,11,
+กรมธนารักษ์,11,11,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,4,,,,,,,,5,2
+กรมศุลกากร,10,10,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,3,,,,,,,,5,1
+สำนักงานสลากกินแบ่งรัฐบาล,6,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,4,1,1
+กรมสรรพากร,2,4,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,4,,,,,,,,
+กรมบัญชีกลาง,3,4,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,4,,,,,,,,,
+สำนักงานบริหารหนี้สาธารณะ,1,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1
+กระทรวงการท่องเที่ยวและกีฬา,118,301,3,2,2,3,3,3,3,2,,,,,,,,,,5,29,,58,22,15,15,,,,1,1,,,,,,,,51,,,,,,14,42,27
+(ระดับกระทรวง/หน่วยงานหลักเอง),83,195,3,2,2,3,3,3,3,2,,,,,,,,,,5,29,,58,22,15,15,,,,1,1,,,,,,,,4,,,,,,2,14,8
+การท่องเที่ยวแห่งประเทศไทย,28,43,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,13,,,,,,12,12,6
+กรมการท่องเที่ยว,20,25,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,12,,,,,,,4,9
+กรมพลศึกษา,11,18,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,9,,,,,,,5,4
+การกีฬาแห่งประเทศไทย,7,7,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,3,,,,,,,4,
+องค์การบริหารการพัฒนาพื้นที่พิเศษเพื่อการท่องเที่ยวอย่างยั่งยืน (องค์การมหาชน),7,7,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,7,,,,,,,,
+มหาวิทยาลัยการกีฬาแห่งชาติ,3,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,3,,,,,,,3,
+กระทรวงศึกษาธิการ,115,257,,,,,,,,,,,,,,,,,,,42,36,36,,,,,17,,,23,44,46,,,,,5,,,,,,,,8,
+(ระดับกระทรวง/หน่วยงานหลักเอง),109,251,,,,,,,,,,,,,,,,,,,42,36,36,,,,,17,,,23,44,46,,,,,,,,,,,,,7,
+สำนักงานปลัดกระทรวงศึกษาธิการ,6,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,5,,,,,,,,1,
+กระทรวงการอุดมศึกษา วิทยาศาสตร์ วิจัย และนวัตกรรม,172,235,9,3,4,7,6,5,4,4,,,,,,,,,,3,19,,,,,,2,1,,,1,,1,2,,,25,18,3,4,,,,,49,10,55
+(ระดับกระทรวง/หน่วยงานหลักเอง),61,71,9,3,4,7,6,5,4,4,,,,,,,,,,1,19,,,,,,2,1,,,1,,1,2,,,,1,,,,,,,1,,
+สถาบันมาตรวิทยาแห่งชาติ (มว.),36,46,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,11,1,,4,,,,,20,5,5
+กรมวิทยาศาสตร์บริการ (วศ.),30,30,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,8,4,,,,,,,12,2,4
+สำนักงานการวิจัยแห่งชาติ (วช.),10,15,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,3,,,,,,,,,12
+สถาบันวิจัยวิทยาศาสตร์และเทคโนโลยีแห่งประเทศไทย (วว.),13,14,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,5,,,,,,,4,,5
+สำนักงานคณะกรรมการส่งเสริมวิทยาศาสตร์ วิจัยและนวัตกรรม,13,13,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,4,2,7
+องค์การพิพิธภัณฑ์วิทยาศาสตร์แห่งชาติ,8,8,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,3,,,,,,3,,2
+สถาบันสารสนเทศทรัพยากรน้ำ (สสน.),7,7,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,4,,2
+สำนักงานคณะกรรมการส่งเสริมวิทยาศาสตร์ วิจัยและนวัตกรรม (สกสว.),4,5,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,4,1,,,,,,,,,
+สำนักงานนวัตกรรมแห่งชาติ (องค์การมหาชน),5,5,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,5
+สถาบันเทคโนโลยีนิวเคลียร์แห่งชาติ (สทน.),4,4,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,1,,2
+สำนักงานสภานโยบายการอุดมศึกษา วิทยาศาสตร์ วิจัยและนวัตกรรมแห่งชาติ,4,4,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,4
+สถาบันวิจัยแสงซินโครตรอน (สซ.),4,4,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,3
+สำนักงานพัฒนาวิทยาศาสตร์และเทคโนโลยีแห่งชาติ (สวทช.),3,4,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,4
+สถาบันวิจัยดาราศาสตร์แห่งชาติ (สดร.),3,3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,2,1,,,,,,,,,
+สำนักงานส่งเสริมเศรษฐกิจสร้างสรรค์ (องค์การมหาชน),2,2,,,,,,,,,,,,,,,,,,2,,,,,,,,,,,,,,,,,,,,,,,,,,,
+กระทรวงการต่างประเทศ,141,203,,17,17,16,,,,,,,,,,,,,,10,7,9,7,,,,,,,28,7,15,8,7,1,,2,11,3,,,,,9,23,6,
+(ระดับกระทรวง/หน่วยงานหลักเอง),141,202,,17,17,16,,,,,,,,,,,,,,10,7,9,7,,,,,,,28,6,15,8,7,1,,2,11,3,,,,,9,23,6,
+กรมการกงสุล,1,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,
+กระทรวงวัฒนธรรม,85,197,,11,15,11,,25,,2,,,,,,,7,,,24,16,21,20,14,14,4,,,,,,,,,,,1,2,,,,5,,,1,2,2
+(ระดับกระทรวง/หน่วยงานหลักเอง),79,184,,11,15,11,,25,,2,,,,,,,7,,,24,16,21,20,14,14,4,,,,,,,,,,,,,,,,,,,,,
+กรมศิลปากร,6,13,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,2,,,,5,,,1,2,2
+ส่วนราชการไม่สังกัดสำนักนายกรัฐมนตรีหรือกระทรวง,137,159,,,,,,,,,,,,,,,,,,16,7,3,15,10,6,4,3,8,7,6,5,10,4,4,5,,3,4,4,2,,,,,9,12,12
+สำนักงานตำรวจแห่งชาติ,50,52,,,,,,,,,,,,,,,,,,14,3,,13,7,6,2,,2,1,2,,2,,,,,,,,,,,,,,,
+สำนักงานคณะกรรมการป้องกันและปราบปรามการทุจริตในภาครัฐ,29,39,,,,,,,,,,,,,,,,,,,,,,,,,1,1,1,1,1,1,1,1,1,,3,3,3,,,,,,7,7,7
+สำนักงานคณะกรรมการนโยบายเขตพัฒนาพิเศษภาค ตอ,28,28,,,,,,,,,,,,,,,,,,2,4,2,2,2,,2,2,2,2,1,1,3,,1,2,,,,,,,,,,,,
+สำนักงานป้องกันและปราบปรามการฟอกเงิน,26,27,,,,,,,,,,,,,,,,,,,,,,,,,,2,2,2,2,2,3,2,2,,,1,1,,,,,,,4,4
+สำนักงานพระพุทธศาสนาแห่งชาติ,7,7,,,,,,,,,,,,,,,,,,,,1,,1,,,,1,1,,1,2,,,,,,,,,,,,,,,
+ศูนย์อำนวยการบริหารจังหวัดชายแดนภาคใต้,5,6,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,2,,,,,2,1,1
+หน่วยงานอิสระของรัฐ,69,139,,,,,,,,,,,,,,,,,,,12,9,7,6,6,5,5,9,10,,21,,18,8,8,,,,9,,,,,,2,2,2
+สำนักงานคณะกรรมการกิจการกระจายเสียง กิจการโทรทัศน์ และกิจการโทรคมนาคมแห่งชาติ,69,139,,,,,,,,,,,,,,,,,,,12,9,7,6,6,5,5,9,10,,21,,18,8,8,,,,9,,,,,,2,2,2
+กระทรวงพลังงาน,46,96,,4,,9,4,,,17,,,,,,,,,,,,,,,,,,21,24,,,,16,,,,,,1,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),45,95,,4,,9,4,,,17,,,,,,,,,,,,,,,,,,21,24,,,,16,,,,,,,,,,,,,,
+สำนักงานนโยบายและแผนพลังงาน,1,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,,
+กระทรวงกลาโหม,64,86,,8,7,5,12,,14,2,1,,,,,,,,,3,9,,,,,,7,,,3,1,,,,1,8,,1,1,,,,,,,,3
+(ระดับกระทรวง/หน่วยงานหลักเอง),61,83,,8,7,5,12,,14,2,1,,,,,,,,,3,9,,,,,,7,,,3,1,,,,1,8,,1,,,,,,,,,1
+สำนักงานปลัดกระทรวงกลาโหม,2,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,2
+บริษัท อู่กรุงเทพ จำกัด,1,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1,,,,,,,,
+สำนักงานคณะกรรมการกำกับหลักทรัพย์และตลาดหลักทรัพย์,27,27,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,3,,,,,,,,16,8,
+(ระดับกระทรวง/หน่วยงานหลักเอง),27,27,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,3,,,,,,,,16,8,
+สำนักงานคณะกรรมการป้องกันและปราบปรามยาเสพติด,12,12,,,,,,,,,,,,,,,,,,,,,4,,,,3,,,,3,,,,,,,,1,,,,,,,1,
+(ระดับกระทรวง/หน่วยงานหลักเอง),12,12,,,,,,,,,,,,,,,,,,,,,4,,,,3,,,,3,,,,,,,,1,,,,,,,1,
+สำนักงานคณะกรรมการกำกับกิจการพลังงาน,4,4,,,,,,,,,,,,,,,,,,,,,,,,,,,4,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),4,4,,,,,,,,,,,,,,,,,,,,,,,,,,,4,,,,,,,,,,,,,,,,,,
+ศูนย์ความเป็นเลิศด้านชีววิทยาศาสตร์ (ศลช.),1,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,2,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),1,2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,2,,,,,,,,,,
+กองทุนเพื่อความเสมอภาคทางการศึกษา,1,1,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),1,1,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,,
+กระทรวงการพัฒนาสังคมและความมั่นคงของมนุษย์,1,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1
+สำนักงานส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการแห่งชาติ,1,1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,1
+รวมทั้งหมด,3116,12933,39,93,322,369,501,429,603,726,369,8,,,,1,86,2,33,278,455,341,396,125,76,90,345,484,540,514,523,614,531,580,420,10,91,474,278,6,,6,,45,801,772,557
+PMONE-1020 · เปรียบเทียบจำนวนครั้งที่รายงานผลนโยบาย แยกตามกระทรวงและรัฐบาล,,,,,,
+กระทรวง,พล.อ.ประยุทธ์ จันทร์โอชา,เศรษฐา ทวีสิน,แพทองธาร ชินวัตร,อนุทิน ชาญวีรกูล (1),อนุทิน ชาญวีรกูล (2),รวม
+สำนักนายกรัฐมนตรี,1031,171,555,106,180,2043
+กระทรวงทรัพยากรธรรมชาติและสิ่งแวดล้อม,290,393,670,103,193,1649
+กระทรวงแรงงาน,540,202,297,,222,1261
+กระทรวงเกษตรและสหกรณ์,388,170,599,8,43,1208
+กระทรวงอุตสาหกรรม,154,68,354,71,174,821
+กระทรวงดิจิทัลเพื่อเศรษฐกิจและสังคม,342,,249,33,191,815
+กระทรวงยุติธรรม,76,61,470,42,88,737
+กระทรวงคมนาคม,54,169,276,68,106,673
+กระทรวงมหาดไทย,23,27,158,140,194,542
+กระทรวงสาธารณสุข,156,101,200,31,52,540
+กระทรวงพาณิชย์,70,70,94,18,225,477
+กระทรวงการคลัง,74,5,123,73,171,447
+กระทรวงการท่องเที่ยวและกีฬา,21,144,2,51,83,301
+กระทรวงศึกษาธิการ,,114,131,5,7,257
+กระทรวงการอุดมศึกษา วิทยาศาสตร์ วิจัย และนวัตกรรม,42,22,7,50,114,235
+กระทรวงการต่างประเทศ,50,33,66,23,31,203
+กระทรวงวัฒนธรรม,64,116,4,8,5,197
+ส่วนราชการไม่สังกัดสำนักนายกรัฐมนตรีหรือกระทรวง,,61,52,13,33,159
+หน่วยงานอิสระของรัฐ,,50,74,9,6,139
+กระทรวงพลังงาน,34,,61,1,,96
+กระทรวงกลาโหม,48,12,21,1,3,86
+สำนักงานคณะกรรมการกำกับหลักทรัพย์และตลาดหลักทรัพย์,,,,3,24,27
+สำนักงานคณะกรรมการป้องกันและปราบปรามยาเสพติด,,4,6,1,1,12
+สำนักงานคณะกรรมการกำกับกิจการพลังงาน,,,4,,,4
+ศูนย์ความเป็นเลิศด้านชีววิทยาศาสตร์ (ศลช.),,,,2,,2
+กองทุนเพื่อความเสมอภาคทางการศึกษา,,1,,,,1
+กระทรวงการพัฒนาสังคมและความมั่นคงของมนุษย์,,,,,1,1
+รวมทั้งหมด,3457,1994,4473,860,2147,12931
+รัฐบาล พล.อ.ประยุทธ์ จันทร์โอชา · ครั้งที่รายงานผลนโยบาย แยกกระทรวง/กรม รายเดือน (เดือน = วันที่บันทึกรายงาน),,,,,,,,,,,,
+กระทรวง / กรม,จำนวนนโยบาย/ข้อสั่งการที่รายงาน,รวมครั้งที่รายงาน,2566,,,,,,,,,
+,,,กุมภาพันธ์,มีนาคม,เมษายน,พฤษภาคม,มิถุนายน,กรกฎาคม,สิงหาคม,กันยายน,ตุลาคม,พฤศจิกายน
+สำนักนายกรัฐมนตรี,372,1031,,5,,4,3,26,165,510,310,8
+สำนักเลขาธิการนายกรัฐมนตรี,354,1004,,,,,,23,160,503,310,8
+สำนักงานปลัดสำนักนายกรัฐมนตรี,13,16,,3,,4,3,3,3,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),1,6,,,,,,,,6,,
+สำนักงานส่งเสริมวิสาหกิจขนาดกลางและขนาดย่อม,1,2,,2,,,,,,,,
+สำนักงานคณะกรรมการส่งเสริมการลงทุน,2,2,,,,,,,2,,,
+กรุงเทพมหานคร,1,1,,,,,,,,1,,
+กระทรวงแรงงาน,133,540,,14,89,87,87,88,87,77,11,
+(ระดับกระทรวง/หน่วยงานหลักเอง),133,540,,14,89,87,87,88,87,77,11,
+กระทรวงเกษตรและสหกรณ์,130,388,,,,134,104,59,81,10,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),130,388,,,,134,104,59,81,10,,
+กระทรวงดิจิทัลเพื่อเศรษฐกิจและสังคม,130,342,20,8,106,49,46,43,51,19,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),119,323,1,8,106,49,46,43,51,19,,
+สำนักงานส่งเสริมเศรษฐกิจดิจิทัล,11,19,19,,,,,,,,,
+กระทรวงทรัพยากรธรรมชาติและสิ่งแวดล้อม,57,290,,,,,133,13,78,66,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),57,290,,,,,133,13,78,66,,
+กระทรวงสาธารณสุข,41,156,,20,34,5,5,71,21,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),41,156,,20,34,5,5,71,21,,,
+กระทรวงอุตสาหกรรม,55,154,,,,1,47,47,12,,47,
+(ระดับกระทรวง/หน่วยงานหลักเอง),55,154,,,,1,47,47,12,,47,
+กระทรวงยุติธรรม,31,76,,,5,22,,27,22,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),31,76,,,5,22,,27,22,,,
+กระทรวงการคลัง,52,74,,,18,11,18,14,13,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),52,74,,,18,11,18,14,13,,,
+กระทรวงพาณิชย์,48,70,,,,4,19,7,25,15,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),48,70,,,,4,19,7,25,15,,
+กระทรวงวัฒนธรรม,28,64,,11,15,11,,25,,2,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),28,64,,11,15,11,,25,,2,,
+กระทรวงคมนาคม,11,54,7,,18,,,,27,2,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),11,54,7,,18,,,,27,2,,
+กระทรวงการต่างประเทศ,13,50,,17,17,16,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),13,50,,17,17,16,,,,,,
+กระทรวงกลาโหม,41,48,,7,7,5,12,,14,2,1,
+(ระดับกระทรวง/หน่วยงานหลักเอง),41,48,,7,7,5,12,,14,2,1,
+กระทรวงการอุดมศึกษา วิทยาศาสตร์ วิจัย และนวัตกรรม,36,42,9,3,4,7,6,5,4,4,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),36,42,9,3,4,7,6,5,4,4,,
+กระทรวงพลังงาน,16,34,,4,,9,4,,,17,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),16,34,,4,,9,4,,,17,,
+กระทรวงมหาดไทย,19,23,,1,7,1,13,1,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),19,23,,1,7,1,13,1,,,,
+กระทรวงการท่องเที่ยวและกีฬา,16,21,3,2,2,3,3,3,3,2,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),16,21,3,2,2,3,3,3,3,2,,
+รวมทั้งหมด,979,3457,39,92,322,369,500,429,603,726,369,8
+รัฐบาล เศรษฐา ทวีสิน · ครั้งที่รายงานผลนโยบาย แยกกระทรวง/กรม รายเดือน (เดือน = วันที่บันทึกรายงาน),,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+กระทรวง / กรม,จำนวนนโยบาย/ข้อสั่งการที่รายงาน,รวมครั้งที่รายงาน,2567,,,,,,,,,,2568,,,,,,,,,,,,2569,,,,,,,
+,,,มีนาคม,เมษายน,พฤษภาคม,มิถุนายน,กรกฎาคม,สิงหาคม,กันยายน,ตุลาคม,พฤศจิกายน,ธันวาคม,มกราคม,กุมภาพันธ์,มีนาคม,เมษายน,พฤษภาคม,มิถุนายน,กรกฎาคม,สิงหาคม,กันยายน,ตุลาคม,พฤศจิกายน,ธันวาคม,มกราคม,กุมภาพันธ์,มีนาคม,เมษายน,พฤษภาคม,มิถุนายน,กรกฎาคม,สิงหาคม
+กระทรวงทรัพยากรธรรมชาติและสิ่งแวดล้อม,157,393,,,,,49,73,73,55,40,,,68,35,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),157,393,,,,,49,73,73,55,40,,,68,35,,,,,,,,,,,,,,,,,
+กระทรวงแรงงาน,66,202,,,,,49,51,51,51,,,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),66,202,,,,,49,51,51,51,,,,,,,,,,,,,,,,,,,,,,
+สำนักนายกรัฐมนตรี,106,171,1,1,2,10,37,27,29,23,10,8,6,,,,,,1,,,,,,,,,,,,,16
+สำนักงานคณะกรรมการนโยบายที่ดินแห่งชาติ,49,72,,,,,15,13,12,11,9,8,4,,,,,,,,,,,,,,,,,,,
+สำนักงานสภาความมั่นคงแห่งชาติ,32,43,,,,,14,11,10,8,,,,,,,,,,,,,,,,,,,,,,
+สำนักงานคณะกรรมการพัฒนาระบบราชการ,10,17,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,16
+สำนักเลขาธิการนายกรัฐมนตรี,10,14,1,1,2,10,,,,,,,,,,,,,,,,,,,,,,,,,,
+สำนักงานปลัดสำนักนายกรัฐมนตรี,9,10,,,,,6,2,2,,,,,,,,,,,,,,,,,,,,,,,
+สำนักงบประมาณ,9,10,,,,,,,4,3,1,,2,,,,,,,,,,,,,,,,,,,
+สำนักงานพัฒนารัฐบาลดิจิทัล (องค์การมหาชน),4,4,,,,,1,1,1,1,,,,,,,,,,,,,,,,,,,,,,
+กรุงเทพมหานคร,1,1,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,
+กระทรวงเกษตรและสหกรณ์,43,170,,78,,23,12,29,16,,,,12,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),43,170,,78,,23,12,29,16,,,,12,,,,,,,,,,,,,,,,,,,
+กระทรวงคมนาคม,14,169,,,,,7,15,17,51,20,25,34,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),14,169,,,,,7,15,17,51,20,25,34,,,,,,,,,,,,,,,,,,,
+กระทรวงการท่องเที่ยวและกีฬา,38,144,,,,,5,29,,58,22,15,15,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),38,144,,,,,5,29,,58,22,15,15,,,,,,,,,,,,,,,,,,,
+กระทรวงวัฒนธรรม,49,116,,7,,,24,16,21,20,14,14,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),49,116,,7,,,24,16,21,20,14,14,,,,,,,,,,,,,,,,,,,,
+กระทรวงศึกษาธิการ,43,114,,,,,,42,36,36,,,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),43,114,,,,,,42,36,36,,,,,,,,,,,,,,,,,,,,,,
+กระทรวงสาธารณสุข,29,101,,,,,30,24,24,23,,,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),29,101,,,,,30,24,24,23,,,,,,,,,,,,,,,,,,,,,,
+กระทรวงพาณิชย์,48,70,,,,,15,12,13,30,,,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),48,70,,,,,15,12,13,30,,,,,,,,,,,,,,,,,,,,,,
+กระทรวงอุตสาหกรรม,28,68,,,,,18,,37,10,3,,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),28,68,,,,,18,,37,10,3,,,,,,,,,,,,,,,,,,,,,
+ส่วนราชการไม่สังกัดสำนักนายกรัฐมนตรีหรือกระทรวง,58,61,,,,,16,7,3,15,10,6,4,,,,,,,,,,,,,,,,,,,
+สำนักงานตำรวจแห่งชาติ,43,45,,,,,14,3,,13,7,6,2,,,,,,,,,,,,,,,,,,,
+สำนักงานคณะกรรมการนโยบายเขตพัฒนาพิเศษภาค ตอ,14,14,,,,,2,4,2,2,2,,2,,,,,,,,,,,,,,,,,,,
+สำนักงานพระพุทธศาสนาแห่งชาติ,2,2,,,,,,,1,,1,,,,,,,,,,,,,,,,,,,,,
+กระทรวงยุติธรรม,20,61,,,,,,61,,,,,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),20,61,,,,,,61,,,,,,,,,,,,,,,,,,,,,,,,
+หน่วยงานอิสระของรัฐ,27,50,,,,,,12,9,7,6,6,5,5,,,,,,,,,,,,,,,,,,
+สำนักงานคณะกรรมการกิจการกระจายเสียง กิจการโทรทัศน์ และกิจการโทรคมนาคมแห่งชาติ,27,50,,,,,,12,9,7,6,6,5,5,,,,,,,,,,,,,,,,,,
+กระทรวงการต่างประเทศ,24,33,,,,,10,7,9,7,,,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),24,33,,,,,10,7,9,7,,,,,,,,,,,,,,,,,,,,,,
+กระทรวงมหาดไทย,23,27,,,,,,21,3,1,,2,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),23,27,,,,,,21,3,1,,2,,,,,,,,,,,,,,,,,,,,
+กระทรวงการอุดมศึกษา วิทยาศาสตร์ วิจัย และนวัตกรรม,18,22,,,,,3,19,,,,,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),16,20,,,,,1,19,,,,,,,,,,,,,,,,,,,,,,,,
+สำนักงานส่งเสริมเศรษฐกิจสร้างสรรค์ (องค์การมหาชน),2,2,,,,,2,,,,,,,,,,,,,,,,,,,,,,,,,
+กระทรวงกลาโหม,8,12,,,,,3,9,,,,,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),8,12,,,,,3,9,,,,,,,,,,,,,,,,,,,,,,,,
+กระทรวงการคลัง,5,5,,,,,,,,5,,,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),5,5,,,,,,,,5,,,,,,,,,,,,,,,,,,,,,,
+สำนักงานคณะกรรมการป้องกันและปราบปรามยาเสพติด,4,4,,,,,,,,4,,,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),4,4,,,,,,,,4,,,,,,,,,,,,,,,,,,,,,,
+กองทุนเพื่อความเสมอภาคทางการศึกษา,1,1,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),1,1,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,
+รวมทั้งหมด,450,1994,1,86,2,33,278,455,341,396,125,76,76,73,35,,,,1,,,,,,,,,,,,,16
+รัฐบาล แพทองธาร ชินวัตร · ครั้งที่รายงานผลนโยบาย แยกกระทรวง/กรม รายเดือน (เดือน = วันที่บันทึกรายงาน),,,,,,,,,,,,,,,,,,,,,,,
+กระทรวง / กรม,จำนวนนโยบาย/ข้อสั่งการที่รายงาน,รวมครั้งที่รายงาน,2568,,,,,,,,,,,,2569,,,,,,,,
+,,,มกราคม,กุมภาพันธ์,มีนาคม,เมษายน,พฤษภาคม,มิถุนายน,กรกฎาคม,สิงหาคม,กันยายน,ตุลาคม,พฤศจิกายน,ธันวาคม,มกราคม,กุมภาพันธ์,มีนาคม,เมษายน,พฤษภาคม,มิถุนายน,กรกฎาคม,สิงหาคม,กันยายน
+กระทรวงทรัพยากรธรรมชาติและสิ่งแวดล้อม,152,670,,,94,98,101,101,88,95,93,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),152,670,,,94,98,101,101,88,95,93,,,,,,,,,,,,
+กระทรวงเกษตรและสหกรณ์,147,599,,48,38,84,26,91,82,13,132,85,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),147,599,,48,38,84,26,91,82,13,132,85,,,,,,,,,,,
+สำนักนายกรัฐมนตรี,334,555,10,172,51,36,64,41,56,49,38,33,2,1,,,,,,,2,,
+สำนักเลขาธิการนายกรัฐมนตรี,76,161,10,145,,1,,1,2,,,,,,,,,,,,2,,
+สำนักงานคณะกรรมการนโยบายที่ดินแห่งชาติ,44,96,,13,11,9,10,8,15,15,9,6,,,,,,,,,,,
+สำนักงานส่งเสริมวิสาหกิจขนาดกลางและขนาดย่อม,70,84,,,,,24,12,12,12,12,12,,,,,,,,,,,
+สถาบันคุณวุฒิวิชาชีพ (องค์การมหาชน),71,71,,8,8,8,8,8,8,8,8,7,,,,,,,,,,,
+สำนักงบประมาณ,24,24,,,6,3,4,3,3,3,2,,,,,,,,,,,,
+กรุงเทพมหานคร,21,21,,2,1,6,,2,,2,4,2,2,,,,,,,,,,
+สำนักงานพัฒนารัฐบาลดิจิทัล (องค์การมหาชน),18,20,,2,2,2,2,2,4,2,2,2,,,,,,,,,,,
+สำนักงานสภาพัฒนาการเศรษฐกิจและสังคมแห่งชาติ,14,16,,,9,4,2,,,,1,,,,,,,,,,,,
+สำนักงานคณะกรรมการการรักษาความมั่นคงปลอดภัยไซเบอร์แห่งชาติ,13,13,,,,,4,1,1,2,,4,,1,,,,,,,,,
+สำนักงานคณะกรรมการกฤษฎีกา,9,12,,,,,,,9,3,,,,,,,,,,,,,
+กรมประชาสัมพันธ์,11,11,,1,1,1,2,2,2,2,,,,,,,,,,,,,
+สำนักงานปลัดสำนักนายกรัฐมนตรี,5,9,,,9,,,,,,,,,,,,,,,,,,
+สำนักงานคณะกรรมการข้าราชการพลเรือน,4,5,,1,3,1,,,,,,,,,,,,,,,,,
+สำนักงานทรัพยากรน้ำแห่งชาติ,5,5,,,1,1,3,,,,,,,,,,,,,,,,
+สำนักงานสภาความมั่นคงแห่งชาติ,3,5,,,,,5,,,,,,,,,,,,,,,,
+สำนักงานบริหารและพัฒนาองค์ความรู้ (องค์การมหาชน),1,2,,,,,,2,,,,,,,,,,,,,,,
+กระทรวงยุติธรรม,200,470,,,1,90,12,61,105,74,22,104,,1,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),200,470,,,1,90,12,61,105,74,22,104,,1,,,,,,,,,
+กระทรวงอุตสาหกรรม,189,354,,,43,55,41,43,55,28,48,41,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),189,354,,,43,55,41,43,55,28,48,41,,,,,,,,,,,
+กระทรวงแรงงาน,108,297,,,,,,,,33,124,140,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),108,297,,,,,,,,33,124,140,,,,,,,,,,,
+กระทรวงคมนาคม,64,276,,7,52,18,69,38,16,22,51,2,,,1,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),64,276,,7,52,18,69,38,16,22,51,2,,,1,,,,,,,,
+กระทรวงดิจิทัลเพื่อเศรษฐกิจและสังคม,133,249,,,52,47,45,31,32,20,22,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),133,249,,,52,47,45,31,32,20,22,,,,,,,,,,,,
+กระทรวงสาธารณสุข,62,200,,30,28,25,28,28,27,34,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),62,200,,30,28,25,28,28,27,34,,,,,,,,,,,,,
+กระทรวงมหาดไทย,91,158,,,20,27,16,4,49,26,16,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),91,158,,,20,27,16,4,49,26,16,,,,,,,,,,,,
+กระทรวงศึกษาธิการ,60,131,,,17,,,23,44,46,,,,,,,,,,,,,1
+(ระดับกระทรวง/หน่วยงานหลักเอง),59,130,,,17,,,23,44,46,,,,,,,,,,,,,
+สำนักงานปลัดกระทรวงศึกษาธิการ,1,1,,,,,,,,,,,,,,,,,,,,,1
+กระทรวงการคลัง,79,123,,,,1,60,10,23,29,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),78,122,,,,1,60,9,23,29,,,,,,,,,,,,,
+กรมศุลกากร,1,1,,,,,,1,,,,,,,,,,,,,,,
+กระทรวงพาณิชย์,86,94,,,14,14,14,13,11,15,13,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),86,94,,,14,14,14,13,11,15,13,,,,,,,,,,,,
+หน่วยงานอิสระของรัฐ,32,74,,,9,10,,21,,18,8,8,,,,,,,,,,,
+สำนักงานคณะกรรมการกิจการกระจายเสียง กิจการโทรทัศน์ และกิจการโทรคมนาคมแห่งชาติ,32,74,,,9,10,,21,,18,8,8,,,,,,,,,,,
+กระทรวงการต่างประเทศ,58,66,,,,,28,7,15,8,7,1,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),58,65,,,,,28,6,15,8,7,1,,,,,,,,,,,
+กรมการกงสุล,1,1,,,,,,1,,,,,,,,,,,,,,,
+กระทรวงพลังงาน,29,61,,,21,24,,,,16,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),29,61,,,21,24,,,,16,,,,,,,,,,,,,
+ส่วนราชการไม่สังกัดสำนักนายกรัฐมนตรีหรือกระทรวง,48,52,,3,8,7,6,5,10,4,4,5,,,,,,,,,,,
+สำนักงานป้องกันและปราบปรามการฟอกเงิน,16,17,,,2,2,2,2,2,3,2,2,,,,,,,,,,,
+สำนักงานคณะกรรมการนโยบายเขตพัฒนาพิเศษภาค ตอ,14,14,,2,2,2,1,1,3,,1,2,,,,,,,,,,,
+สำนักงานคณะกรรมการป้องกันและปราบปรามการทุจริตในภาครัฐ,8,9,,1,1,1,1,1,1,1,1,1,,,,,,,,,,,
+สำนักงานตำรวจแห่งชาติ,7,7,,,2,1,2,,2,,,,,,,,,,,,,,
+สำนักงานพระพุทธศาสนาแห่งชาติ,5,5,,,1,1,,1,2,,,,,,,,,,,,,,
+กระทรวงกลาโหม,10,21,,7,,,3,1,,,,1,8,,1,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),10,21,,7,,,3,1,,,,1,8,,1,,,,,,,,
+กระทรวงการอุดมศึกษา วิทยาศาสตร์ วิจัย และนวัตกรรม,7,7,,2,1,,,1,,1,2,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),7,7,,2,1,,,1,,1,2,,,,,,,,,,,,
+สำนักงานคณะกรรมการป้องกันและปราบปรามยาเสพติด,6,6,,3,,,,3,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),6,6,,3,,,,3,,,,,,,,,,,,,,,
+กระทรวงวัฒนธรรม,2,4,4,,,,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),2,4,4,,,,,,,,,,,,,,,,,,,,
+สำนักงานคณะกรรมการกำกับกิจการพลังงาน,4,4,,,,4,,,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),4,4,,,,4,,,,,,,,,,,,,,,,,
+กระทรวงการท่องเที่ยวและกีฬา,2,2,,,,,1,1,,,,,,,,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),2,2,,,,,1,1,,,,,,,,,,,,,,,
+รวมทั้งหมด,924,4473,14,272,449,540,514,523,613,531,580,420,10,2,2,,,,,,2,,1
+รัฐบาล อนุทิน ชาญวีรกูล (1) · ครั้งที่รายงานผลนโยบาย แยกกระทรวง/กรม รายเดือน (เดือน = วันที่บันทึกรายงาน),,,,,,,,,,,
+กระทรวง / กรม,จำนวนนโยบาย/ข้อสั่งการที่รายงาน,รวมครั้งที่รายงาน,2568,2569,,,,,,,
+,,,ธันวาคม,มกราคม,กุมภาพันธ์,มีนาคม,เมษายน,พฤษภาคม,มิถุนายน,กรกฎาคม,สิงหาคม
+กระทรวงมหาดไทย,54,140,,135,5,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),54,140,,135,5,,,,,,
+สำนักนายกรัฐมนตรี,46,106,17,53,35,,,1,,,
+สำนักงานคณะกรรมการนโยบายที่ดินแห่งชาติ,4,26,,19,7,,,,,,
+สำนักงานปลัดสำนักนายกรัฐมนตรี,14,20,5,12,3,,,,,,
+สำนักงานคณะกรรมการพัฒนาระบบราชการ,9,12,,12,,,,,,,
+สำนักงานคณะกรรมการกฤษฎีกา,6,11,11,,,,,,,,
+กรุงเทพมหานคร,7,10,1,,9,,,,,,
+สำนักงานสภาความมั่นคงแห่งชาติ,6,10,,6,4,,,,,,
+สำนักงานคณะกรรมการการรักษาความมั่นคงปลอดภัยไซเบอร์แห่งชาติ,4,9,,3,6,,,,,,
+สำนักงานพัฒนารัฐบาลดิจิทัล (องค์การมหาชน),4,4,,,4,,,,,,
+สำนักงานคณะกรรมการข้าราชการพลเรือน,3,3,,1,2,,,,,,
+สำนักเลขาธิการนายกรัฐมนตรี,1,1,,,,,,1,,,
+กระทรวงทรัพยากรธรรมชาติและสิ่งแวดล้อม,17,103,16,87,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),17,103,16,87,,,,,,,
+กระทรวงการคลัง,32,73,17,49,6,,,,,1,
+สำนักงานคณะกรรมการนโยบายรัฐวิสาหกิจ,12,15,9,6,,,,,,,
+ธนาคารออมสิน,4,13,1,12,,,,,,,
+ธนาคารเพื่อการส่งออกและนำเข้าแห่งประเทศไทย,4,8,1,5,2,,,,,,
+บริษัทประกันสินเชื่ออุตสาหกรรมขนาดย่อม,7,8,5,3,,,,,,,
+สำนักงานเศรษฐกิจการคลัง,6,6,,6,,,,,,,
+กรมธนารักษ์,4,4,,4,,,,,,,
+กรมสรรพากร,2,4,,,4,,,,,,
+กรมบัญชีกลาง,3,4,,4,,,,,,,
+ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร,4,4,,4,,,,,,,
+กรมศุลกากร,3,3,,3,,,,,,,
+ธนาคารแห่งประเทศไทย,2,3,1,2,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),1,1,,,,,,,,1,
+กระทรวงอุตสาหกรรม,23,71,,21,49,,,,,,1
+กรมส่งเสริมอุตสาหกรรม,15,32,,7,25,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),7,8,,5,3,,,,,,
+สำนักงานเศรษฐกิจอุตสาหกรรม,6,7,,1,6,,,,,,
+กรมโรงงานอุตสาหกรรม,3,7,,,6,,,,,,1
+กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่,4,6,,3,3,,,,,,
+สำนักงานมาตรฐานผลิตภัณฑ์อุตสาหกรรม,5,5,,4,1,,,,,,
+การนิคมอุตสาหกรรมแห่งประเทศไทย,5,5,,,5,,,,,,
+สำนักงานคณะกรรมการอ้อยและน้ำตาลทราย,1,1,,1,,,,,,,
+กระทรวงคมนาคม,14,68,3,37,28,,,,,,
+กรมท่าอากาศยาน,5,17,,13,4,,,,,,
+การรถไฟฟ้าขนส่งมวลชนแห่งประเทศไทย (รฟม.),12,16,,12,4,,,,,,
+กรมการขนส่งทางบก (ขบ.),5,11,,4,7,,,,,,
+กรมเจ้าท่า (จท.),4,8,,,8,,,,,,
+สำนักงานนโยบายและแผนการขนส่งและจราจร,4,8,,6,2,,,,,,
+การท่าเรือแห่งประเทศไทย (กทท.),4,4,3,,1,,,,,,
+กรมการขนส่งทางราง (ขร.),2,2,,1,1,,,,,,
+บริษัท ท่าอากาศยานไทย จำกัด (มหาชน),1,2,,1,1,,,,,,
+กระทรวงการท่องเที่ยวและกีฬา,12,51,,,51,,,,,,
+การท่องเที่ยวแห่งประเทศไทย,4,13,,,13,,,,,,
+กรมการท่องเที่ยว,7,12,,,12,,,,,,
+กรมพลศึกษา,5,9,,,9,,,,,,
+องค์การบริหารการพัฒนาพื้นที่พิเศษเพื่อการท่องเที่ยวอย่างยั่งยืน (องค์การมหาชน),7,7,,,7,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),4,4,,,4,,,,,,
+การกีฬาแห่งประเทศไทย,3,3,,,3,,,,,,
+มหาวิทยาลัยการกีฬาแห่งชาติ,1,3,,,3,,,,,,
+กระทรวงการอุดมศึกษา วิทยาศาสตร์ วิจัย และนวัตกรรม,26,50,25,18,3,4,,,,,
+สถาบันมาตรวิทยาแห่งชาติ (มว.),12,16,11,1,,4,,,,,
+กรมวิทยาศาสตร์บริการ (วศ.),12,12,8,4,,,,,,,
+สำนักงานคณะกรรมการส่งเสริมวิทยาศาสตร์ วิจัยและนวัตกรรม (สกสว.),4,5,4,1,,,,,,,
+สถาบันวิจัยวิทยาศาสตร์และเทคโนโลยีแห่งประเทศไทย (วว.),5,5,,5,,,,,,,
+องค์การพิพิธภัณฑ์วิทยาศาสตร์แห่งชาติ,3,3,,,3,,,,,,
+สถาบันวิจัยดาราศาสตร์แห่งชาติ (สดร.),3,3,2,1,,,,,,,
+สำนักงานการวิจัยแห่งชาติ (วช.),2,3,,3,,,,,,,
+สถาบันเทคโนโลยีนิวเคลียร์แห่งชาติ (สทน.),1,1,,1,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),1,1,,1,,,,,,,
+สถาบันสารสนเทศทรัพยากรน้ำ (สสน.),1,1,,1,,,,,,,
+กระทรวงยุติธรรม,14,42,,,42,,,,,,
+กรมคุมประพฤติ,12,16,,,16,,,,,,
+กรมราชทัณฑ์,3,12,,,12,,,,,,
+กรมบังคับคดี,2,6,,,6,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),3,3,,,3,,,,,,
+กรมพินิจและคุ้มครองเด็กและเยาวชน,2,2,,,2,,,,,,
+กรมสอบสวนคดีพิเศษ,1,2,,,2,,,,,,
+สำนักงานกิจการยุติธรรม,1,1,,,1,,,,,,
+กระทรวงดิจิทัลเพื่อเศรษฐกิจและสังคม,8,33,,33,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),8,33,,33,,,,,,,
+กระทรวงสาธารณสุข,2,31,,,31,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),2,31,,,31,,,,,,
+กระทรวงการต่างประเทศ,16,23,2,11,3,,,,,6,1
+(ระดับกระทรวง/หน่วยงานหลักเอง),16,23,2,11,3,,,,,6,1
+กระทรวงพาณิชย์,18,18,,9,9,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),18,18,,9,9,,,,,,
+ส่วนราชการไม่สังกัดสำนักนายกรัฐมนตรีหรือกระทรวง,9,13,3,4,4,2,,,,,
+สำนักงานคณะกรรมการป้องกันและปราบปรามการทุจริตในภาครัฐ,6,9,3,3,3,,,,,,
+สำนักงานป้องกันและปราบปรามการฟอกเงิน,2,2,,1,1,,,,,,
+ศูนย์อำนวยการบริหารจังหวัดชายแดนภาคใต้,1,2,,,,2,,,,,
+หน่วยงานอิสระของรัฐ,4,9,,,9,,,,,,
+สำนักงานคณะกรรมการกิจการกระจายเสียง กิจการโทรทัศน์ และกิจการโทรคมนาคมแห่งชาติ,4,9,,,9,,,,,,
+กระทรวงเกษตรและสหกรณ์,5,8,,8,,,,,,,
+กรมชลประทาน,3,3,,3,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),2,3,,3,,,,,,,
+กรมประมง,1,2,,2,,,,,,,
+กระทรวงวัฒนธรรม,3,8,1,2,,,,5,,,
+กรมศิลปากร,3,8,1,2,,,,5,,,
+กระทรวงศึกษาธิการ,5,5,,5,,,,,,,
+สำนักงานปลัดกระทรวงศึกษาธิการ,5,5,,5,,,,,,,
+สำนักงานคณะกรรมการกำกับหลักทรัพย์และตลาดหลักทรัพย์,3,3,3,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),3,3,3,,,,,,,,
+ศูนย์ความเป็นเลิศด้านชีววิทยาศาสตร์ (ศลช.),1,2,2,,,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),1,2,2,,,,,,,,
+กระทรวงพลังงาน,1,1,,,1,,,,,,
+สำนักงานนโยบายและแผนพลังงาน,1,1,,,1,,,,,,
+กระทรวงกลาโหม,1,1,,,1,,,,,,
+บริษัท อู่กรุงเทพ จำกัด,1,1,,,1,,,,,,
+สำนักงานคณะกรรมการป้องกันและปราบปรามยาเสพติด,1,1,,,1,,,,,,
+(ระดับกระทรวง/หน่วยงานหลักเอง),1,1,,,1,,,,,,
+รวมทั้งหมด,126,860,89,472,278,6,,6,,7,2
+รัฐบาล อนุทิน ชาญวีรกูล (2) · ครั้งที่รายงานผลนโยบาย แยกกระทรวง/กรม รายเดือน (เดือน = วันที่บันทึกรายงาน),,,,,,
+กระทรวง / กรม,จำนวนนโยบาย/ข้อสั่งการที่รายงาน,รวมครั้งที่รายงาน,2569,,,
+,,,กรกฎาคม,สิงหาคม,กันยายน,ตุลาคม
+กระทรวงพาณิชย์,74,225,,103,62,60
+กรมการค้าภายใน,28,64,,51,7,6
+(ระดับกระทรวง/หน่วยงานหลักเอง),42,44,,,21,23
+กรมพัฒนาธุรกิจการค้า,21,26,,9,9,8
+กรมการค้าต่างประเทศ,16,22,,9,8,5
+สถาบันวิจัยและพัฒนาอัญมณีและเครื่องประดับแห่งชาติ (องค์การมหาชน),9,19,,6,7,6
+กรมส่งเสริมการค้าระหว่างประเทศ,18,18,,6,6,6
+สำนักงานนโยบายและยุทธศาสตร์การค้า,6,13,,5,4,4
+กรมทรัพย์สินทางปัญญา,5,9,,9,,
+กรมเจรจาการค้าระหว่างประเทศ,7,7,,5,,2
+สถาบันระหว่างประเทศเพื่อการค้าและการพัฒนา (องค์การมหาชน),2,2,,2,,
+สถาบันส่งเสริมศิลปหัตถกรรมไทย (องค์การมหาชน),1,1,,1,,
+กระทรวงแรงงาน,96,222,,,185,37
+(ระดับกระทรวง/หน่วยงานหลักเอง),96,222,,,185,37
+กระทรวงมหาดไทย,115,194,28,117,23,26
+(ระดับกระทรวง/หน่วยงานหลักเอง),115,194,28,117,23,26
+กระทรวงทรัพยากรธรรมชาติและสิ่งแวดล้อม,89,193,,77,94,22
+(ระดับกระทรวง/หน่วยงานหลักเอง),89,193,,77,94,22
+กระทรวงดิจิทัลเพื่อเศรษฐกิจและสังคม,92,191,,66,63,62
+(ระดับกระทรวง/หน่วยงานหลักเอง),92,191,,66,63,62
+สำนักนายกรัฐมนตรี,122,180,,78,52,50
+สำนักงานคณะกรรมการส่งเสริมการลงทุน,45,45,,30,,15
+สำนักงานส่งเสริมวิสาหกิจขนาดกลางและขนาดย่อม,8,28,,,24,4
+สำนักงานคณะกรรมการนโยบายที่ดินแห่งชาติ,9,18,,6,6,6
+สำนักงานคณะกรรมการพัฒนาระบบราชการ,14,16,,12,4,
+สำนักงานคณะกรรมการกฤษฎีกา,14,16,,16,,
+สำนักงานคณะกรรมการข้าราชการพลเรือน,11,15,,6,6,3
+สำนักงานพัฒนารัฐบาลดิจิทัล (องค์การมหาชน),10,10,,,,10
+กรุงเทพมหานคร,7,9,,4,3,2
+สำนักงานสภาความมั่นคงแห่งชาติ,6,8,,,4,4
+สำนักงานปลัดสำนักนายกรัฐมนตรี,7,7,,3,2,2
+สำนักงบประมาณ,5,5,,,2,3
+สถาบันคุณวุฒิวิชาชีพ (องค์การมหาชน),3,3,,1,1,1
+กระทรวงอุตสาหกรรม,95,174,2,102,,70
+(ระดับกระทรวง/หน่วยงานหลักเอง),50,98,2,95,,1
+กรมส่งเสริมอุตสาหกรรม,22,36,,,,36
+การนิคมอุตสาหกรรมแห่งประเทศไทย,15,15,,7,,8
+กรมโรงงานอุตสาหกรรม,7,15,,,,15
+สำนักงานเศรษฐกิจอุตสาหกรรม,3,3,,,,3
+กรมอุตสาหกรรมพื้นฐานและการเหมืองแร่,2,3,,,,3
+สำนักงานมาตรฐานผลิตภัณฑ์อุตสาหกรรม,2,2,,,,2
+สำนักงานคณะกรรมการอ้อยและน้ำตาลทราย,2,2,,,,2
+กระทรวงการคลัง,83,171,,50,86,35
+ธนาคารออมสิน,12,27,,,16,11
+กรมสรรพสามิต,13,25,,16,5,4
+บริษัทประกันสินเชื่ออุตสาหกรรมขนาดย่อม,15,25,,19,6,
+สำนักงานเศรษฐกิจการคลัง,21,25,,1,17,7
+กองทุนเงินให้กู้ยืมเพื่อการศึกษา,12,12,,1,11,
+ธนาคารเพื่อการส่งออกและนำเข้าแห่งประเทศไทย,6,12,,2,8,2
+ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร,10,10,,6,2,2
+ธนาคารแห่งประเทศไทย,9,9,,1,5,3
+กรมธนารักษ์,7,7,,,5,2
+สำนักงานสลากกินแบ่งรัฐบาล,6,6,,4,1,1
+สำนักงานคณะกรรมการนโยบายรัฐวิสาหกิจ,6,6,,,5,1
+กรมศุลกากร,6,6,,,5,1
+สำนักงานบริหารหนี้สาธารณะ,1,1,,,,1
+กระทรวงการอุดมศึกษา วิทยาศาสตร์ วิจัย และนวัตกรรม,85,114,,49,10,55
+สถาบันมาตรวิทยาแห่งชาติ (มว.),24,30,,20,5,5
+กรมวิทยาศาสตร์บริการ (วศ.),18,18,,12,2,4
+สำนักงานคณะกรรมการส่งเสริมวิทยาศาสตร์ วิจัยและนวัตกรรม,13,13,,4,2,7
+สำนักงานการวิจัยแห่งชาติ (วช.),8,12,,,,12
+สถาบันวิจัยวิทยาศาสตร์และเทคโนโลยีแห่งประเทศไทย (วว.),8,9,,4,,5
+สถาบันสารสนเทศทรัพยากรน้ำ (สสน.),6,6,,4,,2
+องค์การพิพิธภัณฑ์วิทยาศาสตร์แห่งชาติ,5,5,,3,,2
+สำนักงานนวัตกรรมแห่งชาติ (องค์การมหาชน),5,5,,,,5
+สำนักงานสภานโยบายการอุดมศึกษา วิทยาศาสตร์ วิจัยและนวัตกรรมแห่งชาติ,4,4,,,,4
+สถาบันวิจัยแสงซินโครตรอน (สซ.),4,4,,,1,3
+สำนักงานพัฒนาวิทยาศาสตร์และเทคโนโลยีแห่งชาติ (สวทช.),3,4,,,,4
+สถาบันเทคโนโลยีนิวเคลียร์แห่งชาติ (สทน.),3,3,,1,,2
+(ระดับกระทรวง/หน่วยงานหลักเอง),1,1,,1,,
+กระทรวงคมนาคม,28,106,,23,18,65
+การรถไฟฟ้าขนส่งมวลชนแห่งประเทศไทย (รฟม.),18,28,,11,6,11
+สำนักงานนโยบายและแผนการขนส่งและจราจร,23,27,,10,7,10
+การท่าเรือแห่งประเทศไทย (กทท.),12,15,,,1,14
+กรมการขนส่งทางบก (ขบ.),11,15,,1,1,13
+กรมเจ้าท่า (จท.),6,12,,,,12
+บริษัท ขนส่ง จำกัด (บขส.),3,3,,,1,2
+บริษัท วิทยุการบินแห่งประเทศไทย จำกัด,3,3,,1,1,1
+กรมการขนส่งทางราง (ขร.),1,1,,,,1
+องค์การขนส่งมวลชนกรุงเทพ (ขสมก.),1,1,,,1,
+กรมทางหลวง,1,1,,,,1
+กระทรวงยุติธรรม,34,88,,,72,16
+กรมคุมประพฤติ,10,20,,,20,
+กรมราชทัณฑ์,8,18,,,12,6
+กรมสอบสวนคดีพิเศษ,15,15,,,12,3
+(ระดับกระทรวง/หน่วยงานหลักเอง),4,11,,,7,4
+กรมคุ้มครองสิทธิและเสรีภาพ,4,10,,,10,
+กรมพินิจและคุ้มครองเด็กและเยาวชน,6,6,,,4,2
+กรมบังคับคดี,5,5,,,4,1
+สำนักงานกิจการยุติธรรม,3,3,,,3,
+กระทรวงการท่องเที่ยวและกีฬา,50,83,,14,42,27
+การท่องเที่ยวแห่งประเทศไทย,24,30,,12,12,6
+(ระดับกระทรวง/หน่วยงานหลักเอง),23,24,,2,14,8
+กรมการท่องเที่ยว,13,13,,,4,9
+กรมพลศึกษา,6,9,,,5,4
+การกีฬาแห่งประเทศไทย,4,4,,,4,
+มหาวิทยาลัยการกีฬาแห่งชาติ,2,3,,,3,
+กระทรวงสาธารณสุข,24,52,,23,21,8
+(ระดับกระทรวง/หน่วยงานหลักเอง),24,51,,22,21,8
+สำนักงานหลักประกันสุขภาพแห่งชาติ,1,1,,1,,
+กระทรวงเกษตรและสหกรณ์,12,43,3,31,5,4
+(ระดับกระทรวง/หน่วยงานหลักเอง),9,38,,31,5,2
+การยางแห่งประเทศไทย,1,3,3,,,
+กรมส่งเสริมการเกษตร,1,1,,,,1
+กรมประมง,1,1,,,,1
+ส่วนราชการไม่สังกัดสำนักนายกรัฐมนตรีหรือกระทรวง,22,33,,9,12,12
+สำนักงานคณะกรรมการป้องกันและปราบปรามการทุจริตในภาครัฐ,15,21,,7,7,7
+สำนักงานป้องกันและปราบปรามการฟอกเงิน,8,8,,,4,4
+ศูนย์อำนวยการบริหารจังหวัดชายแดนภาคใต้,4,4,,2,1,1
+กระทรวงการต่างประเทศ,30,31,3,22,6,
+(ระดับกระทรวง/หน่วยงานหลักเอง),30,31,3,22,6,
+สำนักงานคณะกรรมการกำกับหลักทรัพย์และตลาดหลักทรัพย์,24,24,,16,8,
+(ระดับกระทรวง/หน่วยงานหลักเอง),24,24,,16,8,
+กระทรวงศึกษาธิการ,7,7,,,7,
+(ระดับกระทรวง/หน่วยงานหลักเอง),7,7,,,7,
+หน่วยงานอิสระของรัฐ,6,6,,2,2,2
+สำนักงานคณะกรรมการกิจการกระจายเสียง กิจการโทรทัศน์ และกิจการโทรคมนาคมแห่งชาติ,6,6,,2,2,2
+กระทรวงวัฒนธรรม,3,5,,1,2,2
+กรมศิลปากร,3,5,,1,2,2
+กระทรวงกลาโหม,3,3,,,,3
+สำนักงานปลัดกระทรวงกลาโหม,2,2,,,,2
+(ระดับกระทรวง/หน่วยงานหลักเอง),1,1,,,,1
+สำนักงานคณะกรรมการป้องกันและปราบปรามยาเสพติด,1,1,,,1,
+(ระดับกระทรวง/หน่วยงานหลักเอง),1,1,,,1,
+กระทรวงการพัฒนาสังคมและความมั่นคงของมนุษย์,1,1,,,,1
+สำนักงานส่งเสริมและพัฒนาคุณภาพชีวิตคนพิการแห่งชาติ,1,1,,,,1
+รวมทั้งหมด,635,2147,36,783,771,557`;
+
+    // =========================================================================
+    // 2. CONSTANTS, THAI MONTH HELPERS & COLOR PALETTES
+    // =========================================================================
+    const THAI_MONTHS = [
+      'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน',
+      'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'
+    ];
+    const THAI_MONTH_SHORT = {
+      'มกราคม': 'ม.ค.', 'กุมภาพันธ์': 'ก.พ.', 'มีนาคม': 'มี.ค.', 'เมษายน': 'เม.ย.',
+      'พฤษภาคม': 'พ.ค.', 'มิถุนายน': 'มิ.ย.', 'กรกฎาคม': 'ก.ค.', 'สิงหาคม': 'ส.ค.',
+      'กันยายน': 'ก.ย.', 'ตุลาคม': 'ต.ค.', 'พฤศจิกายน': 'พ.ย.', 'ธันวาคม': 'ธ.ค.'
+    };
+
+    const KNOWN_TOP_MINISTRIES = new Set([
+      'สำนักนายกรัฐมนตรี',
+      'กระทรวงทรัพยากรธรรมชาติและสิ่งแวดล้อม',
+      'กระทรวงแรงงาน',
+      'กระทรวงเกษตรและสหกรณ์',
+      'กระทรวงอุตสาหกรรม',
+      'กระทรวงดิจิทัลเพื่อเศรษฐกิจและสังคม',
+      'กระทรวงยุติธรรม',
+      'กระทรวงคมนาคม',
+      'กระทรวงมหาดไทย',
+      'กระทรวงสาธารณสุข',
+      'กระทรวงพาณิชย์',
+      'กระทรวงการคลัง',
+      'กระทรวงการท่องเที่ยวและกีฬา',
+      'กระทรวงศึกษาธิการ',
+      'กระทรวงการอุดมศึกษา วิทยาศาสตร์ วิจัย และนวัตกรรม',
+      'กระทรวงการต่างประเทศ',
+      'กระทรวงวัฒนธรรม',
+      'ส่วนราชการไม่สังกัดสำนักนายกรัฐมนตรีหรือกระทรวง',
+      'หน่วยงานอิสระของรัฐ',
+      'กระทรวงพลังงาน',
+      'กระทรวงกลาโหม',
+      'สำนักงานคณะกรรมการกำกับหลักทรัพย์และตลาดหลักทรัพย์',
+      'สำนักงานคณะกรรมการป้องกันและปราบปรามยาเสพติด',
+      'สำนักงานคณะกรรมการกำกับกิจการพลังงาน',
+      'ศูนย์ความเป็นเลิศด้านชีววิทยาศาสตร์ (ศลช.)',
+      'กองทุนเพื่อความเสมอภาคทางการศึกษา',
+      'กระทรวงการพัฒนาสังคมและความมั่นคงของมนุษย์'
+    ]);
+
+    const GOV_COLORS = [
+      { bg: '#2563eb', light: '#dbeafe', text: '#1e40af', border: '#93c5fd', badge: 'bg-blue-100 text-blue-800 border-blue-200' },
+      { bg: '#059669', light: '#d1fae5', text: '#065f46', border: '#6ee7b7', badge: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
+      { bg: '#d97706', light: '#fef3c7', text: '#92400e', border: '#fcd34d', badge: 'bg-amber-100 text-amber-900 border-amber-200' },
+      { bg: '#7c3aed', light: '#ede9fe', text: '#5b21b6', border: '#c4b5fd', badge: 'bg-purple-100 text-purple-800 border-purple-200' },
+      { bg: '#e11d48', light: '#ffe4e6', text: '#9f1239', border: '#fda4af', badge: 'bg-rose-100 text-rose-800 border-rose-200' },
+      { bg: '#0891b2', light: '#cffafe', text: '#155e75', border: '#67e8f9', badge: 'bg-cyan-100 text-cyan-800 border-cyan-200' },
+      { bg: '#4f46e5', light: '#e0e7ff', text: '#3730a3', border: '#a5b4fc', badge: 'bg-indigo-100 text-indigo-800 border-indigo-200' }
+    ];
+
+    const STORAGE_KEY = 'PM1_SMART_DASHBOARD_DATA_V1';
+
+    // Global State
+    let appData = {
+      governments: [],        // Array of gov names in order
+      tablesByGov: {},        // { 'ALL': TableObj, 'พล.อ.ประยุทธ์ จันทร์โอชา': TableObj, ... }
+      comparisonMatrix: null, // Parsed comparison table or dynamically computed
+      allYearMonths: [],      // Sorted array of { key: '2566-กุมภาพันธ์', year: '2566', month: 'กุมภาพันธ์', label: 'ก.พ. 66' }
+      allYears: [],           // ['2566', '2567', '2568', '2569']
+      allMinistries: []       // Ordered list of 27+ top ministries
+    };
+
+    let uiState = {
+      activeTab: 'overview',
+      selectedGov: 'ALL',
+      selectedYear: 'ALL',
+      selectedMinistry: 'ALL',
+      searchQuery: '',
+      timelineMode: 'stackedGov',
+      drillMinistry: 'สำนักนายกรัฐมนตรี',
+      expandedMinistries: new Set(['สำนักนายกรัฐมนตรี', 'กระทรวงพาณิชย์', 'กระทรวงการคลัง', 'กระทรวงคมนาคม'])
+    };
+
+    function formatNumber(n) {
+      if (n === null || n === undefined || isNaN(n)) return '0';
+      return Number(n).toLocaleString('th-TH');
+    }
+
+    function getMonthSortKey(yearStr, monthName) {
+      const y = parseInt(yearStr, 10) || 2566;
+      const mIdx = THAI_MONTHS.indexOf(monthName);
+      return y * 100 + (mIdx >= 0 ? mIdx + 1 : 99);
+    }
+
+    function formatMonthShort(yearStr, monthName) {
+      const mShort = THAI_MONTH_SHORT[monthName] || monthName;
+      const yShort = String(yearStr).slice(-2);
+      return `${mShort} ${yShort}`;
+    }
+
+    function getGovColor(govName) {
+      const idx = appData.governments.indexOf(govName);
+      return GOV_COLORS[(idx >= 0 ? idx : 0) % GOV_COLORS.length];
+    }
+
+    // =========================================================================
+    // 3. MULTI-TABLE PMONE-1020 CSV PARSER ENGINE
+    // =========================================================================
+    function splitCSVLine(line) {
+      // Handles both comma-separated and tab-separated lines
+      if (line.indexOf('\t') >= 0 && line.indexOf(',') === -1) {
+        return line.split('\t').map(s => s.trim());
+      }
+      const res = [];
+      let cur = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const ch = line[i];
+        if (ch === '"') {
+          inQuotes = !inQuotes;
+        } else if (ch === ',' && !inQuotes) {
+          res.push(cur.trim());
+          cur = '';
+        } else {
+          cur += ch;
+        }
+      }
+      res.push(cur.trim());
+      return res;
+    }
+
+    function parseMonthlyTableSection(titleLine, lines, knownMinistriesSet) {
+      // Determine government key from titleLine
+      let govKey = 'ALL';
+      if (titleLine.includes('ทุกรัฐบาล')) {
+        govKey = 'ALL';
+      } else if (titleLine.includes('รัฐบาล')) {
+        const m = titleLine.match(/รัฐบาล\s*([^·,]+)/);
+        if (m && m[1]) {
+          govKey = m[1].trim();
+        }
+      }
+
+      if (lines.length < 2) return null;
+      const headerRow1 = splitCSVLine(lines[0]); //กระทรวง / กรม, จำนวนนโยบาย..., รวมครั้งที่รายงาน, 2566, ...
+      const headerRow2 = splitCSVLine(lines[1]); // ,,,กุมภาพันธ์,มีนาคม,...
+
+      const yearMonths = [];
+      let currentYear = '';
+      const maxCols = Math.max(headerRow1.length, headerRow2.length);
+      for (let c = 3; c < maxCols; c++) {
+        const yCell = (headerRow1[c] || '').trim();
+        const mCell = (headerRow2[c] || '').trim();
+        if (yCell && /^\d{4}$/.test(yCell)) {
+          currentYear = yCell;
+        }
+        if (mCell && currentYear) {
+          const key = `${currentYear}-${mCell}`;
+          yearMonths.push({
+            colIndex: c,
+            key,
+            year: currentYear,
+            month: mCell,
+            label: formatMonthShort(currentYear, mCell),
+            sortKey: getMonthSortKey(currentYear, mCell)
+          });
+        }
+      }
+
+      // Parse data rows
+      const rawRows = [];
+      let totalRow = null;
+      for (let r = 2; r < lines.length; r++) {
+        const cols = splitCSVLine(lines[r]);
+        const name = (cols[0] || '').trim();
+        if (!name) continue;
+        const policies = parseInt(cols[1], 10) || 0;
+        const totalReports = parseInt(cols[2], 10) || 0;
+        const monthly = {};
+        yearMonths.forEach(ym => {
+          const val = parseInt(cols[ym.colIndex], 10) || 0;
+          if (val > 0) monthly[ym.key] = val;
+        });
+
+        if (name === 'รวมทั้งหมด' || name === 'รวม') {
+          totalRow = { name, policies, totalReports, monthly };
+        } else {
+          rawRows.push({ name, policies, totalReports, monthly });
+        }
+      }
+
+      // Group into Ministries -> Departments
+      const ministries = [];
+      let currentMinistry = null;
+
+      for (let i = 0; i < rawRows.length; i++) {
+        const row = rawRows[i];
+        const nextRow = rawRows[i + 1];
+
+        // Check if this row is a top-level ministry
+        let isMinistry = knownMinistriesSet.has(row.name) || row.name.startsWith('กระทรวง');
+        // Or if not explicitly in knownMinistriesSet, check if it is followed by '(ระดับกระทรวง/หน่วยงานหลักเอง)'
+        if (!isMinistry && nextRow && nextRow.name === '(ระดับกระทรวง/หน่วยงานหลักเอง)') {
+          isMinistry = true;
+          knownMinistriesSet.add(row.name);
+        }
+        // Or if currentMinistry is null, the very first row must be a ministry
+        if (!isMinistry && !currentMinistry) {
+          isMinistry = true;
+          knownMinistriesSet.add(row.name);
+        }
+
+        if (isMinistry) {
+          currentMinistry = {
+            name: row.name,
+            policies: row.policies,
+            totalReports: row.totalReports,
+            monthly: { ...row.monthly },
+            departments: []
+          };
+          ministries.push(currentMinistry);
+        } else if (currentMinistry) {
+          currentMinistry.departments.push({
+            name: row.name,
+            ministryName: currentMinistry.name,
+            policies: row.policies,
+            totalReports: row.totalReports,
+            monthly: { ...row.monthly }
+          });
+        }
+      }
+
+      // Compute totalRow if missing
+      if (!totalRow) {
+        const monthlySum = {};
+        let polSum = 0;
+        let repSum = 0;
+        ministries.forEach(m => {
+          polSum += m.policies;
+          repSum += m.totalReports;
+          Object.entries(m.monthly).forEach(([k, v]) => {
+            monthlySum[k] = (monthlySum[k] || 0) + v;
+          });
+        });
+        totalRow = { name: 'รวมทั้งหมด', policies: polSum, totalReports: repSum, monthly: monthlySum };
+      }
+
+      return {
+        govKey,
+        title: titleLine.replace(/,+$/, '').trim(),
+        yearMonths,
+        ministries,
+        totalRow
+      };
+    }
+
+    function parseComparisonTableSection(lines, knownMinistriesSet) {
+      if (lines.length < 2) return null;
+      const header = splitCSVLine(lines[0]);
+      // กระทรวง, พล.อ.ประยุทธ์ จันทร์โอชา, เศรษฐา ทวีสิน, แพทองธาร ชินวัตร, อนุทิน ชาญวีรกูล (1), อนุทิน ชาญวีรกูล (2), รวม
+      const govCols = [];
+      for (let c = 1; c < header.length; c++) {
+        const gName = (header[c] || '').trim();
+        if (gName && gName !== 'รวม' && gName !== 'รวมทั้งหมด') {
+          govCols.push({ colIndex: c, govName: gName });
+        }
+      }
+      const rows = [];
+      let totalByGov = {};
+      let grandTotal = 0;
+
+      for (let r = 1; r < lines.length; r++) {
+        const cols = splitCSVLine(lines[r]);
+        const minName = (cols[0] || '').trim();
+        if (!minName) continue;
+        const byGov = {};
+        let rowSum = 0;
+        govCols.forEach(gc => {
+          const v = parseInt(cols[gc.colIndex], 10) || 0;
+          byGov[gc.govName] = v;
+          rowSum += v;
+        });
+        const explicitTotal = parseInt(cols[header.length - 1], 10) || rowSum;
+
+        if (minName === 'รวมทั้งหมด' || minName === 'รวม') {
+          totalByGov = byGov;
+          grandTotal = explicitTotal;
+        } else {
+          knownMinistriesSet.add(minName);
+          rows.push({ ministry: minName, byGov, total: explicitTotal });
+        }
+      }
+
+      return {
+        governments: govCols.map(g => g.govName),
+        rows,
+        totalByGov,
+        grandTotal
+      };
+    }
+
+    function parseFullPMOneDataset(rawText) {
+      const allLines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+      const sections = [];
+      let currentSection = null;
+
+      for (let i = 0; i < allLines.length; i++) {
+        const line = allLines[i];
+        const firstCell = splitCSVLine(line)[0] || '';
+        const isSectionTitle =
+          firstCell.startsWith('PMONE-1020') ||
+          (firstCell.startsWith('รัฐบาล') && firstCell.includes('·')) ||
+          (firstCell.includes('ครั้งที่รายงานผลนโยบาย'));
+
+        if (isSectionTitle) {
+          currentSection = { titleLine: firstCell, lines: [] };
+          sections.push(currentSection);
+        } else if (currentSection) {
+          currentSection.lines.push(line);
+        } else {
+          // Single table without title line
+          currentSection = { titleLine: 'รัฐบาล ข้อมูลนำเข้าใหม่ · ครั้งที่รายงานผลนโยบาย', lines: [line] };
+          sections.push(currentSection);
+        }
+      }
+
+      const knownMinistriesSet = new Set(KNOWN_TOP_MINISTRIES);
+      let comparisonMatrix = null;
+      const tablesByGov = {};
+      const govOrder = [];
+
+      // First pass: parse comparison section if present to populate knownMinistriesSet & govOrder
+      sections.forEach(sec => {
+        if (sec.titleLine.includes('เปรียบเทียบจำนวนครั้ง')) {
+          comparisonMatrix = parseComparisonTableSection(sec.lines, knownMinistriesSet);
+          if (comparisonMatrix) {
+            comparisonMatrix.governments.forEach(g => {
+              if (!govOrder.includes(g)) govOrder.push(g);
+            });
+          }
+        }
+      });
+
+      // Second pass: parse monthly tables
+      sections.forEach(sec => {
+        if (!sec.titleLine.includes('เปรียบเทียบจำนวนครั้ง')) {
+          const parsed = parseMonthlyTableSection(sec.titleLine, sec.lines, knownMinistriesSet);
+          if (parsed && parsed.ministries.length > 0) {
+            tablesByGov[parsed.govKey] = parsed;
+            if (parsed.govKey !== 'ALL' && !govOrder.includes(parsed.govKey)) {
+              govOrder.push(parsed.govKey);
+            }
+          }
+        }
+      });
+
+      return { tablesByGov, govOrder, comparisonMatrix, knownMinistriesSet };
+    }
+
+    // Rebuilds 'ALL' table and comparisonMatrix dynamically whenever new governments or entries are merged
+    function rebuildDerivedAggregates() {
+      const govs = appData.governments;
+      // Collect all unique yearMonths across all tables
+      const ymMap = new Map();
+      Object.values(appData.tablesByGov).forEach(tb => {
+        tb.yearMonths.forEach(ym => {
+          if (!ymMap.has(ym.key)) {
+            ymMap.set(ym.key, {
+              key: ym.key,
+              year: ym.year,
+              month: ym.month,
+              label: ym.label,
+              sortKey: ym.sortKey
+            });
+          }
+        });
+      });
+
+      appData.allYearMonths = Array.from(ymMap.values()).sort((a, b) => a.sortKey - b.sortKey);
+      const yearsSet = new Set(appData.allYearMonths.map(ym => ym.year));
+      appData.allYears = Array.from(yearsSet).sort();
+
+      // Collect all ministries ordered by total reports in ALL (or sum across govs)
+      const minMap = new Map();
+      govs.forEach(g => {
+        const tb = appData.tablesByGov[g];
+        if (!tb) return;
+        tb.ministries.forEach(m => {
+          if (!minMap.has(m.name)) {
+            minMap.set(m.name, { byGov: {}, total: 0, policiesByGov: {} });
+          }
+          const entry = minMap.get(m.name);
+          entry.byGov[g] = m.totalReports;
+          entry.policiesByGov[g] = m.policies;
+          entry.total += m.totalReports;
+        });
+      });
+
+      // Also include any ministries from ALL table
+      if (appData.tablesByGov['ALL']) {
+        appData.tablesByGov['ALL'].ministries.forEach(m => {
+          if (!minMap.has(m.name)) {
+            minMap.set(m.name, { byGov: {}, total: m.totalReports, policiesByGov: {} });
+          }
+        });
+      }
+
+      // Build dynamic comparisonMatrix
+      const compRows = [];
+      const totalByGov = {};
+      govs.forEach(g => { totalByGov[g] = 0; });
+      let grandTotal = 0;
+
+      Array.from(minMap.entries())
+        .sort((a, b) => b[1].total - a[1].total)
+        .forEach(([ministry, data]) => {
+          let rowSum = 0;
+          govs.forEach(g => {
+            const v = data.byGov[g] || 0;
+            rowSum += v;
+            totalByGov[g] = (totalByGov[g] || 0) + v;
+          });
+          grandTotal += rowSum;
+          compRows.push({
+            ministry,
+            byGov: data.byGov,
+            policiesByGov: data.policiesByGov,
+            total: rowSum
+          });
+        });
+
+      appData.comparisonMatrix = {
+        governments: govs,
+        rows: compRows,
+        totalByGov,
+        grandTotal
+      };
+
+      appData.allMinistries = compRows.map(r => r.ministry);
+    }
+
+    function loadDatasetFromRawText(rawText, saveToStorage = false) {
+      const parsed = parseFullPMOneDataset(rawText);
+      appData.governments = parsed.govOrder;
+      appData.tablesByGov = parsed.tablesByGov;
+      rebuildDerivedAggregates();
+      if (saveToStorage) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            governments: appData.governments,
+            tablesByGov: appData.tablesByGov
+          }));
+        } catch (e) {
+          console.warn('LocalStorage save warning:', e);
+        }
+      }
+      populateFilterDropdowns();
+      refreshAllViews();
+    }
+
+    function saveAppDataToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          governments: appData.governments,
+          tablesByGov: appData.tablesByGov
+        }));
+        updateStorageStatusBadge(true);
+      } catch (e) {
+        console.warn('Storage error:', e);
+      }
+    }
+
+    function updateStorageStatusBadge(isCustom) {
+      const badge = document.getElementById('dataStatusBadge');
+      const totalRep = appData.tablesByGov['ALL']
+        ? appData.tablesByGov['ALL'].totalRow.totalReports
+        : appData.comparisonMatrix.grandTotal;
+      if (badge) {
+        badge.textContent = `${isCustom ? 'ข้อมูลอัปเดตแล้ว' : 'ข้อมูลพร้อมใช้งาน'} (${appData.governments.length} รัฐบาล · ${appData.allMinistries.length} กระทรวง · ${formatNumber(totalRep)} ครั้ง)`;
+      }
+      const stText = document.getElementById('storageSummaryText');
+      if (stText) {
+        stText.innerHTML = `ปัจจุบันมีข้อมูล <strong>${appData.governments.length} รัฐบาล</strong>, <strong>${appData.allMinistries.length} กระทรวงหลัก</strong>, ช่วงเวลา <strong>${appData.allYearMonths.length} เดือน</strong> (รวมรายงานทั้งสิ้น <strong>${formatNumber(totalRep)} ครั้ง</strong>)`;
+      }
+    }
+
+    // =========================================================================
+    // 4. DYNAMIC FILTERING & AGGREGATION ENGINE
+    // =========================================================================
+    function getActiveTableData() {
+      const gov = uiState.selectedGov;
+      const year = uiState.selectedYear;
+      const minFilter = uiState.selectedMinistry;
+      const query = uiState.searchQuery.trim().toLowerCase();
+
+      const baseTable = appData.tablesByGov[gov] || appData.tablesByGov['ALL'];
+      if (!baseTable) return null;
+
+      // Filter yearMonths by selected year
+      const activeYearMonths = baseTable.yearMonths.filter(ym => year === 'ALL' || ym.year === year);
+      const activeYMKeys = new Set(activeYearMonths.map(ym => ym.key));
+
+      // Filter ministries & departments and recompute totals for the active year filter
+      const filteredMinistries = [];
+      let totalReportsFiltered = 0;
+      let totalPoliciesFiltered = 0;
+      let directMinistryReports = 0;
+      let subDeptReports = 0;
+      let activeSubDeptCount = 0;
+      const monthlyTotals = {};
+
+      baseTable.ministries.forEach(min => {
+        if (minFilter !== 'ALL' && min.name !== minFilter) return;
+
+        // Calculate ministry's reports within selected year
+        let minRep = 0;
+        const minMonthly = {};
+        if (year === 'ALL') {
+          minRep = min.totalReports;
+          Object.assign(minMonthly, min.monthly);
+        } else {
+          Object.entries(min.monthly).forEach(([k, v]) => {
+            if (activeYMKeys.has(k)) {
+              minRep += v;
+              minMonthly[k] = v;
+            }
+          });
+        }
+
+        // Filter departments
+        const depts = [];
+        min.departments.forEach(d => {
+          let dRep = 0;
+          const dMonthly = {};
+          if (year === 'ALL') {
+            dRep = d.totalReports;
+            Object.assign(dMonthly, d.monthly);
+          } else {
+            Object.entries(d.monthly).forEach(([k, v]) => {
+              if (activeYMKeys.has(k)) {
+                dRep += v;
+                dMonthly[k] = v;
+              }
+            });
+          }
+
+          const matchesSearch = !query ||
+            min.name.toLowerCase().includes(query) ||
+            d.name.toLowerCase().includes(query);
+
+          if (matchesSearch && (dRep > 0 || year === 'ALL')) {
+            depts.push({
+              ...d,
+              filteredReports: dRep,
+              filteredMonthly: dMonthly
+            });
+          }
+
+          if (dRep > 0) {
+            if (d.name === '(ระดับกระทรวง/หน่วยงานหลักเอง)') {
+              directMinistryReports += dRep;
+            } else {
+              subDeptReports += dRep;
+              activeSubDeptCount++;
+            }
+          }
+        });
+
+        const minMatchesSearch = !query ||
+          min.name.toLowerCase().includes(query) ||
+          depts.length > 0;
+
+        if (minMatchesSearch && (minRep > 0 || (year === 'ALL' && min.totalReports > 0))) {
+          filteredMinistries.push({
+            ...min,
+            filteredReports: minRep,
+            filteredMonthly: minMonthly,
+            filteredDepartments: depts
+          });
+          totalReportsFiltered += minRep;
+          totalPoliciesFiltered += min.policies;
+          Object.entries(minMonthly).forEach(([k, v]) => {
+            monthlyTotals[k] = (monthlyTotals[k] || 0) + v;
+          });
+        }
+      });
+
+      // Use official totalRow policies when no ministry/search filter is applied
+      const displayPolicies = (minFilter === 'ALL' && !query && year === 'ALL')
+        ? baseTable.totalRow.policies
+        : totalPoliciesFiltered;
+
+      const displayTotalReports = (minFilter === 'ALL' && !query && year === 'ALL')
+        ? baseTable.totalRow.totalReports
+        : totalReportsFiltered;
+
+      return {
+        gov,
+        year,
+        yearMonths: activeYearMonths,
+        ministries: filteredMinistries,
+        totalReports: displayTotalReports,
+        totalPolicies: displayPolicies,
+        directMinistryReports,
+        subDeptReports,
+        activeSubDeptCount,
+        monthlyTotals
+      };
+    }
+
+    function populateFilterDropdowns() {
+      const govSel = document.getElementById('globalGovFilter');
+      const yearSel = document.getElementById('globalYearFilter');
+      const minSel = document.getElementById('globalMinistryFilter');
+      const drillSel = document.getElementById('drillMinistrySelect');
+      const h2hA = document.getElementById('h2hGovA');
+      const h2hB = document.getElementById('h2hGovB');
+      const qeGovList = document.getElementById('qeGovList');
+      const qeMinList = document.getElementById('qeMinistryList');
+
+      if (govSel) {
+        const cur = uiState.selectedGov;
+        govSel.innerHTML = `<option value="ALL">ทุกรัฐบาล (รวมทั้งหมด)</option>` +
+          appData.governments.map(g => `<option value="${g}">รัฐบาล ${g}</option>`).join('');
+        govSel.value = (cur === 'ALL' || appData.governments.includes(cur)) ? cur : 'ALL';
+      }
+
+      if (yearSel) {
+        const curY = uiState.selectedYear;
+        yearSel.innerHTML = `<option value="ALL">ทุกปี (${appData.allYears[0] || '2566'}–${appData.allYears[appData.allYears.length - 1] || '2569'})</option>` +
+          appData.allYears.map(y => `<option value="${y}">พ.ศ. ${y}</option>`).join('');
+        yearSel.value = (curY === 'ALL' || appData.allYears.includes(curY)) ? curY : 'ALL';
+      }
+
+      if (minSel) {
+        const curM = uiState.selectedMinistry;
+        minSel.innerHTML = `<option value="ALL">ทุกกระทรวง (${appData.allMinistries.length} หน่วยงานหลัก)</option>` +
+          appData.allMinistries.map(m => `<option value="${m}">${m}</option>`).join('');
+        minSel.value = (curM === 'ALL' || appData.allMinistries.includes(curM)) ? curM : 'ALL';
+      }
+
+      if (drillSel) {
+        drillSel.innerHTML = appData.allMinistries.map(m => `<option value="${m}">${m}</option>`).join('');
+        if (!appData.allMinistries.includes(uiState.drillMinistry)) {
+          uiState.drillMinistry = appData.allMinistries[0] || 'สำนักนายกรัฐมนตรี';
+        }
+        drillSel.value = uiState.drillMinistry;
+      }
+
+      if (h2hA && h2hB && appData.governments.length >= 2) {
+        const curA = h2hA.value;
+        const curB = h2hB.value;
+        const opts = appData.governments.map(g => `<option value="${g}">รัฐบาล ${g}</option>`).join('');
+        h2hA.innerHTML = opts;
+        h2hB.innerHTML = opts;
+        h2hA.value = appData.governments.includes(curA) ? curA : (appData.governments[2] || appData.governments[0]);
+        h2hB.value = appData.governments.includes(curB) ? curB : (appData.governments[4] || appData.governments[1]);
+      }
+
+      if (qeGovList) {
+        qeGovList.innerHTML = appData.governments.map(g => `<option value="${g}">`).join('');
+        const qeGovInput = document.getElementById('qeGovInput');
+        if (qeGovInput && !qeGovInput.value) {
+          qeGovInput.value = appData.governments[appData.governments.length - 1] || '';
+        }
+      }
+      if (qeMinList) {
+        qeMinList.innerHTML = appData.allMinistries.map(m => `<option value="${m}">`).join('');
+        const qeMinInput = document.getElementById('qeMinistryInput');
+        if (qeMinInput && !qeMinInput.value) {
+          qeMinInput.value = appData.allMinistries[0] || '';
+        }
+      }
+    }
+
+    // =========================================================================
+    // 5. KPI STRIP & EXECUTIVE OVERVIEW RENDERERS
+    // =========================================================================
+    function renderKPIStrip(activeData) {
+      const container = document.getElementById('kpiStripSection');
+      if (!container || !activeData) return;
+
+      const grandTotalAll = appData.tablesByGov['ALL']
+        ? appData.tablesByGov['ALL'].totalRow.totalReports
+        : appData.comparisonMatrix.grandTotal;
+
+      const sharePct = grandTotalAll > 0 ? ((activeData.totalReports / grandTotalAll) * 100).toFixed(1) : '100.0';
+      const intensity = activeData.totalPolicies > 0
+        ? (activeData.totalReports / activeData.totalPolicies).toFixed(2)
+        : '0.00';
+
+      // Active months & Peak month
+      const monthEntries = Object.entries(activeData.monthlyTotals).filter(([, v]) => v > 0);
+      const activeMonthCount = monthEntries.length;
+      const avgPerMonth = activeMonthCount > 0 ? Math.round(activeData.totalReports / activeMonthCount) : 0;
+
+      let peakMonthKey = '-';
+      let peakMonthVal = 0;
+      monthEntries.forEach(([k, v]) => {
+        if (v > peakMonthVal) {
+          peakMonthVal = v;
+          peakMonthKey = k;
+        }
+      });
+      const peakLabel = peakMonthKey !== '-'
+        ? formatMonthShort(peakMonthKey.split('-')[0], peakMonthKey.split('-')[1])
+        : '-';
+
+      // Top ministry in current filter
+      const sortedMins = [...activeData.ministries].sort((a, b) => b.filteredReports - a.filteredReports);
+      const topMin = sortedMins[0];
+      const topMinShare = (topMin && activeData.totalReports > 0)
+        ? ((topMin.filteredReports / activeData.totalReports) * 100).toFixed(1)
+        : '0.0';
+
+      // Sub-department vs Direct ministry reporting share
+      const totalSubAndDirect = activeData.subDeptReports + activeData.directMinistryReports;
+      const subDeptPct = totalSubAndDirect > 0
+        ? ((activeData.subDeptReports / totalSubAndDirect) * 100).toFixed(1)
+        : '0.0';
+
+      const cards = [
+        {
+          label: 'รวมครั้งที่รายงานผล',
+          value: formatNumber(activeData.totalReports),
+          unit: 'ครั้ง',
+          sub: `คิดเป็น ${sharePct}% ของฐานข้อมูลรวม (${formatNumber(grandTotalAll)})`,
+          accent: 'border-l-4 border-l-blue-600',
+          badge: 'bg-blue-50 text-blue-700'
+        },
+        {
+          label: 'จำนวนนโยบาย/ข้อสั่งการ',
+          value: formatNumber(activeData.totalPolicies),
+          unit: 'นโยบาย',
+          sub: `ความถี่เฉลี่ย ${intensity} ครั้ง/นโยบาย`,
+          accent: 'border-l-4 border-l-emerald-600',
+          badge: 'bg-emerald-50 text-emerald-700'
+        },
+        {
+          label: 'อัตราการรายงานเฉลี่ย/เดือน',
+          value: formatNumber(avgPerMonth),
+          unit: 'ครั้ง/เดือน',
+          sub: `จาก ${activeMonthCount} เดือนที่มีการรายงานผล`,
+          accent: 'border-l-4 border-l-amber-500',
+          badge: 'bg-amber-50 text-amber-800'
+        },
+        {
+          label: 'เดือนที่รายงานสูงสุด (Peak)',
+          value: formatNumber(peakMonthVal),
+          unit: `ครั้ง (${peakLabel})`,
+          sub: peakMonthKey !== '-' ? `เดือน ${peakMonthKey.replace('-', ' พ.ศ. ')}` : 'ไม่มีข้อมูลในตัวกรองนี้',
+          accent: 'border-l-4 border-l-purple-600',
+          badge: 'bg-purple-50 text-purple-700'
+        },
+        {
+          label: 'หน่วยงานที่รายงานสูงสุด',
+          value: topMin ? formatNumber(topMin.filteredReports) : '0',
+          unit: `ครั้ง (${topMinShare}%)`,
+          sub: topMin ? topMin.name : '-',
+          accent: 'border-l-4 border-l-rose-600',
+          badge: 'bg-rose-50 text-rose-700'
+        },
+        {
+          label: 'การรายงานระดับกรมย่อย',
+          value: `${subDeptPct}%`,
+          unit: `(${formatNumber(activeData.subDeptReports)} ครั้ง)`,
+          sub: `จาก ${activeData.ministries.length} กระทรวง · ${activeData.activeSubDeptCount} กรมย่อย`,
+          accent: 'border-l-4 border-l-cyan-600',
+          badge: 'bg-cyan-50 text-cyan-800'
+        }
+      ];
+
+      container.innerHTML = cards.map(c => `
+        <div class="bg-white rounded-xl border border-slate-200 p-3.5 shadow-xs hover:shadow-md transition ${c.accent} print-card">
+          <div class="text-xs font-semibold text-slate-500 truncate">${c.label}</div>
+          <div class="mt-1.5 flex items-baseline gap-1.5 flex-wrap">
+            <span class="text-xl sm:text-2xl font-bold font-heading text-slate-900">${c.value}</span>
+            <span class="text-xs font-semibold px-1.5 py-0.5 rounded ${c.badge}">${c.unit}</span>
+          </div>
+          <div class="mt-1.5 text-xs text-slate-600 truncate" title="${c.sub}">${c.sub}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderSmartInsights(activeData) {
+      const container = document.getElementById('smartInsightsContainer');
+      const scopeLbl = document.getElementById('insightScopeLabel');
+      if (!container || !activeData) return;
+
+      const govText = uiState.selectedGov === 'ALL' ? 'ทุกรัฐบาล' : `รัฐบาล ${uiState.selectedGov}`;
+      const yearText = uiState.selectedYear === 'ALL' ? 'ทุกปี พ.ศ. (2566–2569)' : `ปี พ.ศ. ${uiState.selectedYear}`;
+      const minText = uiState.selectedMinistry === 'ALL' ? 'ทุกกระทรวง' : uiState.selectedMinistry;
+      if (scopeLbl) {
+        scopeLbl.textContent = `ขอบเขตข้อมูล: ${govText} · ${yearText} · ${minText}`;
+      }
+
+      const sortedMins = [...activeData.ministries].sort((a, b) => b.filteredReports - a.filteredReports);
+      const top3 = sortedMins.slice(0, 3);
+      const top3Sum = top3.reduce((s, m) => s + m.filteredReports, 0);
+      const top3Share = activeData.totalReports > 0 ? ((top3Sum / activeData.totalReports) * 100).toFixed(1) : '0';
+
+      // Highest intensity ministry (with at least 10 policies)
+      const highIntensityMins = [...activeData.ministries]
+        .filter(m => m.policies >= 10 && m.filteredReports > 0)
+        .sort((a, b) => (b.filteredReports / b.policies) - (a.filteredReports / a.policies));
+      const bestIntMin = highIntensityMins[0] || sortedMins[0];
+      const bestIntVal = bestIntMin && bestIntMin.policies > 0
+        ? (bestIntMin.filteredReports / bestIntMin.policies).toFixed(2)
+        : '0.00';
+
+      // Government comparison insight
+      let govInsightTitle = 'เปรียบเทียบภาพรวม 5 รัฐบาล';
+      let govInsightBody = '';
+      if (uiState.selectedGov === 'ALL') {
+        const comp = appData.comparisonMatrix;
+        const sortedGovs = [...comp.governments].sort((a, b) => (comp.totalByGov[b] || 0) - (comp.totalByGov[a] || 0));
+        const g1 = sortedGovs[0];
+        const g2 = sortedGovs[1];
+        govInsightBody = `รัฐบาล <strong>${g1}</strong> มีจำนวนครั้งการรายงานสูงสุด <strong>${formatNumber(comp.totalByGov[g1])} ครั้ง</strong> (${((comp.totalByGov[g1] / comp.grandTotal) * 100).toFixed(1)}%) ตามด้วยรัฐบาล <strong>${g2}</strong> จำนวน <strong>${formatNumber(comp.totalByGov[g2])} ครั้ง</strong> ขณะที่รัฐบาล <strong>อนุทิน ชาญวีรกูล (2)</strong> มีอัตราเร่งการรายงานเฉลี่ยต่อเดือนสูงสุดถึง <strong>536.8 ครั้ง/เดือน</strong>`;
+      } else {
+        const tb = appData.tablesByGov[uiState.selectedGov];
+        const activeM = Object.values(activeData.monthlyTotals).filter(v => v > 0).length;
+        const avgM = activeM > 0 ? (activeData.totalReports / activeM).toFixed(1) : '0';
+        govInsightTitle = `จุดเด่นของรัฐบาล ${uiState.selectedGov}`;
+        govInsightBody = `มีการรายงานผลรวม <strong>${formatNumber(activeData.totalReports)} ครั้ง</strong> จาก <strong>${formatNumber(activeData.totalPolicies)} นโยบาย</strong> กระจายใน <strong>${activeM} เดือน</strong> (เฉลี่ย <strong>${avgM} ครั้ง/เดือน</strong>) โดยมีหน่วยงานที่ร่วมรายงานทั้งสิ้น <strong>${activeData.ministries.length} กระทรวงหลัก</strong>`;
+      }
+
+      container.innerHTML = `
+        <div class="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200/80">
+          <div class="text-xs font-bold text-blue-900 uppercase tracking-wide">1. ${govInsightTitle}</div>
+          <p class="text-xs sm:text-sm text-slate-700 mt-1 leading-relaxed">${govInsightBody}</p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-emerald-50/70 border border-emerald-200/80">
+          <div class="text-xs font-bold text-emerald-900 uppercase tracking-wide">2. การกระจุกตัวของหน่วยงานหลัก (Top 3 Concentration)</div>
+          <p class="text-xs sm:text-sm text-slate-700 mt-1 leading-relaxed">
+            หน่วยงานที่รายงานสูงสุด 3 อันดับแรก ได้แก่ <strong>${top3.map(m => `${m.name} (${formatNumber(m.filteredReports)})`).join(', ') || '-'}</strong> รวมกันคิดเป็นสัดส่วนถึง <strong>${top3Share}%</strong> ของการรายงานทั้งหมดในขอบเขตที่เลือก
+          </p>
+        </div>
+        <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200/80">
+          <div class="text-xs font-bold text-amber-900 uppercase tracking-wide">3. ความถี่การติดตามต่อนโยบาย & ระดับกรมย่อย</div>
+          <p class="text-xs sm:text-sm text-slate-700 mt-1 leading-relaxed">
+            ${bestIntMin ? `<strong>${bestIntMin.name}</strong> มีความถี่ในการรายงานผลสูงสุดเฉลี่ย <strong>${bestIntVal} ครั้ง/นโยบาย</strong>` : '-'}
+            และมีการรายงานผ่านระดับกรม/หน่วยงานในสังกัดโดยตรง <strong>${formatNumber(activeData.subDeptReports)} ครั้ง</strong> (${activeData.activeSubDeptCount} หน่วยงานย่อย)
+          </p>
+        </div>
+      `;
+    }
+
+    function setTimelineMode(mode) {
+      uiState.timelineMode = mode;
+      ['stackedGov', 'totalTrend', 'cumulative'].forEach(m => {
+        const btn = document.getElementById(`tlMode-${m}`);
+        if (btn) {
+          btn.className = m === mode
+            ? 'px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition cursor-pointer'
+            : 'px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 transition cursor-pointer';
+        }
+      });
+      renderTimelineChart(getActiveTableData());
+    }
+
+    function renderTimelineChart(activeData) {
+      const container = document.getElementById('timelineChartContainer');
+      const legendEl = document.getElementById('timelineChartLegend');
+      if (!container || !activeData) return;
+
+      // Determine timeline months to display (all 45 months or filtered by year)
+      const months = appData.allYearMonths.filter(ym => uiState.selectedYear === 'ALL' || ym.year === uiState.selectedYear);
+      if (months.length === 0) {
+        container.innerHTML = `<div class="text-center py-8 text-xs text-slate-500">ไม่มีข้อมูลรายเดือนสำหรับตัวกรองนี้</div>`;
+        return;
+      }
+
+      const mode = uiState.timelineMode;
+      const govs = appData.governments;
+
+      // Build series per month
+      const monthData = months.map(ym => {
+        const byGov = {};
+        let sumGovs = 0;
+        govs.forEach(g => {
+          if (uiState.selectedGov !== 'ALL' && uiState.selectedGov !== g) {
+            byGov[g] = 0;
+            return;
+          }
+          const tb = appData.tablesByGov[g];
+          if (!tb) {
+            byGov[g] = 0;
+            return;
+          }
+          let val = 0;
+          tb.ministries.forEach(m => {
+            if (uiState.selectedMinistry !== 'ALL' && m.name !== uiState.selectedMinistry) return;
+            if (uiState.searchQuery) {
+              const q = uiState.searchQuery.toLowerCase();
+              const matchM = m.name.toLowerCase().includes(q);
+              const matchD = m.departments.some(d => d.name.toLowerCase().includes(q));
+              if (!matchM && !matchD) return;
+            }
+            val += (m.monthly[ym.key] || 0);
+          });
+          byGov[g] = val;
+          sumGovs += val;
+        });
+
+        const totalVal = activeData.monthlyTotals[ym.key] !== undefined ? activeData.monthlyTotals[ym.key] : sumGovs;
+        return {
+          ...ym,
+          byGov,
+          total: totalVal
+        };
+      });
+
+      // Compute cumulative if needed
+      let runningSum = 0;
+      monthData.forEach(md => {
+        runningSum += md.total;
+        md.cumulative = runningSum;
+      });
+
+      // Render Legend
+      if (mode === 'stackedGov') {
+        legendEl.innerHTML = govs.map(g => {
+          const c = getGovColor(g);
+          const isMuted = uiState.selectedGov !== 'ALL' && uiState.selectedGov !== g;
+          return `
+            <button onclick="selectGovFromLegend('${g}')" class="inline-flex items-center gap-1.5 px-2 py-1 rounded-md border border-slate-200 hover:bg-slate-50 transition cursor-pointer ${isMuted ? 'opacity-40' : ''}">
+              <span class="w-3 h-3 rounded-xs shrink-0" style="background:${c.bg}"></span>
+              <span class="font-medium text-slate-700">${g}</span>
+            </button>
+          `;
+        }).join('');
+      } else if (mode === 'totalTrend') {
+        legendEl.innerHTML = `
+          <span class="inline-flex items-center gap-1.5 text-slate-700 font-medium">
+            <span class="w-3 h-3 rounded-full bg-blue-600 inline-block"></span> จำนวนครั้งที่รายงานรายเดือน
+          </span>
+          <span class="inline-flex items-center gap-1.5 text-slate-600">
+            <span class="w-4 h-0.5 bg-amber-500 inline-block"></span> เส้นค่าเฉลี่ยต่อเดือนที่มีรายงาน
+          </span>
+        `;
+      } else {
+        legendEl.innerHTML = `
+          <span class="inline-flex items-center gap-1.5 text-emerald-700 font-medium">
+            <span class="w-3 h-3 rounded-full bg-emerald-600 inline-block"></span> ยอดสะสมจำนวนครั้งที่รายงานผล (Cumulative Reports)
+          </span>
+        `;
+      }
+
+      // Build SVG
+      const svgWidth = Math.max(920, months.length * 28 + 90);
+      const svgHeight = 290;
+      const padLeft = 52;
+      const padRight = 24;
+      const padTop = 26;
+      const padBottom = 64;
+      const plotW = svgWidth - padLeft - padRight;
+      const plotH = svgHeight - padTop - padBottom;
+
+      const maxVal = Math.max(
+        10,
+        ...monthData.map(d => mode === 'cumulative' ? d.cumulative : d.total)
+      );
+      const yTicks = 5;
+      let gridHtml = '';
+      for (let t = 0; t <= yTicks; t++) {
+        const v = Math.round((maxVal / yTicks) * t);
+        const y = padTop + plotH - (t / yTicks) * plotH;
+        gridHtml += `
+          <line x1="${padLeft}" y1="${y}" x2="${svgWidth - padRight}" y2="${y}" stroke="#e2e8f0" stroke-dasharray="${t === 0 ? 'none' : '3,3'}" />
+          <text x="${padLeft - 8}" y="${y + 4}" text-anchor="end" fill="#64748b" font-size="11">${formatNumber(v)}</text>
+        `;
+      }
+
+      const stepX = plotW / monthData.length;
+      const barW = Math.min(24, Math.max(10, stepX * 0.68));
+      let barsOrLinesHtml = '';
+      let xLabelsHtml = '';
+
+      if (mode === 'stackedGov') {
+        monthData.forEach((md, i) => {
+          const cx = padLeft + i * stepX + stepX / 2;
+          const bx = cx - barW / 2;
+          let curY = padTop + plotH;
+
+          govs.forEach(g => {
+            const v = md.byGov[g] || 0;
+            if (v <= 0) return;
+            const h = (v / maxVal) * plotH;
+            curY -= h;
+            const c = getGovColor(g);
+            barsOrLinesHtml += `
+              <rect x="${bx.toFixed(1)}" y="${curY.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(1.5, h).toFixed(1)}" fill="${c.bg}" rx="1.5">
+                <title>${md.month} ${md.year} · รัฐบาล ${g}: ${formatNumber(v)} ครั้ง (รวมเดือนนี้ ${formatNumber(md.total)} ครั้ง)</title>
+              </rect>
+            `;
+          });
+
+          if (md.total > 0) {
+            barsOrLinesHtml += `
+              <text x="${cx.toFixed(1)}" y="${Math.max(12, curY - 4).toFixed(1)}" text-anchor="middle" fill="#334155" font-size="10" font-weight="600">${md.total}</text>
+            `;
+          }
+        });
+      } else {
+        // Line & Area mode (totalTrend or cumulative)
+        const strokeColor = mode === 'cumulative' ? '#059669' : '#2563eb';
+        const fillColor = mode === 'cumulative' ? 'rgba(5, 150, 105, 0.14)' : 'rgba(37, 99, 235, 0.14)';
+        const pts = monthData.map((md, i) => {
+          const val = mode === 'cumulative' ? md.cumulative : md.total;
+          const x = padLeft + i * stepX + stepX / 2;
+          const y = padTop + plotH - (val / maxVal) * plotH;
+          return { x, y, val, md };
+        });
+
+        if (pts.length > 0) {
+          const linePath = pts.map((p, idx) => `${idx === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+          const areaPath = `${linePath} L${pts[pts.length - 1].x.toFixed(1)},${padTop + plotH} L${pts[0].x.toFixed(1)},${padTop + plotH} Z`;
+          barsOrLinesHtml += `<path d="${areaPath}" fill="${fillColor}" />`;
+          barsOrLinesHtml += `<path d="${linePath}" fill="none" stroke="${strokeColor}" stroke-width="2.5" />`;
+
+          pts.forEach(p => {
+            if (p.val > 0) {
+              barsOrLinesHtml += `
+                <circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.8" fill="#ffffff" stroke="${strokeColor}" stroke-width="2">
+                  <title>${p.md.month} ${p.md.year}: ${formatNumber(p.val)} ครั้ง</title>
+                </circle>
+                <text x="${p.x.toFixed(1)}" y="${Math.max(12, p.y - 6).toFixed(1)}" text-anchor="middle" fill="#1e293b" font-size="9.5" font-weight="600">${formatNumber(p.val)}</text>
+              `;
+            }
+          });
+        }
+      }
+
+      // X-axis labels & Year dividers
+      let prevYear = '';
+      monthData.forEach((md, i) => {
+        const cx = padLeft + i * stepX + stepX / 2;
+        if (md.year !== prevYear) {
+          if (prevYear !== '') {
+            const divX = padLeft + i * stepX;
+            barsOrLinesHtml += `<line x1="${divX}" y1="${padTop}" x2="${divX}" y2="${padTop + plotH + 45}" stroke="#94a3b8" stroke-dasharray="2,2" />`;
+          }
+          barsOrLinesHtml += `<text x="${cx + 12}" y="${padTop + 10}" fill="#1e40af" font-size="11" font-weight="700">พ.ศ. ${md.year}</text>`;
+          prevYear = md.year;
+        }
+        xLabelsHtml += `
+          <g transform="translate(${cx.toFixed(1)}, ${padTop + plotH + 14})">
+            <text transform="rotate(-40)" text-anchor="end" fill="#475569" font-size="10.5" font-weight="${md.total > 0 ? '600' : '400'}">${md.label}</text>
+          </g>
+        `;
+      });
+
+      container.innerHTML = `
+        <svg viewBox="0 0 ${svgWidth} ${svgHeight}" class="w-full h-auto min-w-[820px]">
+          ${gridHtml}
+          ${barsOrLinesHtml}
+          ${xLabelsHtml}
+        </svg>
+      `;
+    }
+
+    function selectGovFromLegend(govName) {
+      uiState.selectedGov = (uiState.selectedGov === govName) ? 'ALL' : govName;
+      const sel = document.getElementById('globalGovFilter');
+      if (sel) sel.value = uiState.selectedGov;
+      refreshAllViews();
+    }
+
+    function renderOverviewCharts() {
+      const activeData = getActiveTableData();
+      if (!activeData) return;
+
+      // 1. Ministry Ranking Bars
+      const rankContainer = document.getElementById('ministryRankingChart');
+      const metric = (document.getElementById('ministryRankMetric') || {}).value || 'reports';
+      const limit = parseInt((document.getElementById('ministryRankLimit') || {}).value || '12', 10);
+
+      if (rankContainer) {
+        const list = [...activeData.ministries].map(m => ({
+          ...m,
+          intensity: m.policies > 0 ? (m.filteredReports / m.policies) : 0
+        }));
+
+        list.sort((a, b) => {
+          if (metric === 'policies') return b.policies - a.policies;
+          if (metric === 'intensity') return b.intensity - a.intensity;
+          return b.filteredReports - a.filteredReports;
+        });
+
+        const sliced = list.slice(0, limit);
+        const maxMetricVal = Math.max(1, ...sliced.map(m => {
+          if (metric === 'policies') return m.policies;
+          if (metric === 'intensity') return m.intensity;
+          return m.filteredReports;
+        }));
+
+        rankContainer.innerHTML = sliced.map((m, idx) => {
+          const val = metric === 'policies' ? m.policies : (metric === 'intensity' ? m.intensity : m.filteredReports);
+          const pctWidth = Math.max(2, (val / maxMetricVal) * 100);
+          const shareOfTotal = activeData.totalReports > 0 ? ((m.filteredReports / activeData.totalReports) * 100).toFixed(1) : '0.0';
+          const subDeptCount = m.departments.filter(d => d.name !== '(ระดับกระทรวง/หน่วยงานหลักเอง)').length;
+
+          return `
+            <div onclick="openMinistryDrillFromOverview('${m.name.replace(/'/g, "\\'")}')" class="group p-2.5 rounded-lg border border-slate-100 hover:border-blue-300 hover:bg-blue-50/40 transition cursor-pointer">
+              <div class="flex items-center justify-between gap-2 text-xs mb-1">
+                <div class="flex items-center gap-2 min-w-0">
+                  <span class="w-5 h-5 rounded-full bg-slate-100 group-hover:bg-blue-600 group-hover:text-white text-slate-700 font-bold flex items-center justify-center shrink-0 text-xs">${idx + 1}</span>
+                  <span class="font-semibold text-slate-900 truncate group-hover:text-blue-700">${m.name}</span>
+                  ${subDeptCount > 0 ? `<span class="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-xs shrink-0">${subDeptCount} กรมย่อย</span>` : ''}
+                </div>
+                <div class="flex items-center gap-3 shrink-0 text-xs">
+                  <span class="text-slate-500">${formatNumber(m.policies)} นโยบาย</span>
+                  <span class="text-amber-700 font-medium">${m.intensity.toFixed(2)} ครั้ง/นโยบาย</span>
+                  <span class="font-bold text-blue-700 min-w-[85px] text-right">${formatNumber(m.filteredReports)} ครั้ง (${shareOfTotal}%)</span>
+                </div>
+              </div>
+              <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-blue-600 to-indigo-500 rounded-full transition-all duration-300" style="width:${pctWidth.toFixed(1)}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 2. Government Share Breakdown Widget
+      const govWidget = document.getElementById('govShareOverviewWidget');
+      if (govWidget && appData.comparisonMatrix) {
+        const comp = appData.comparisonMatrix;
+        const grand = Math.max(1, comp.grandTotal);
+        govWidget.innerHTML = comp.governments.map(g => {
+          const rep = comp.totalByGov[g] || 0;
+          const tb = appData.tablesByGov[g];
+          const pol = tb ? tb.totalRow.policies : 0;
+          const pct = ((rep / grand) * 100).toFixed(1);
+          const c = getGovColor(g);
+          const isSelected = uiState.selectedGov === g;
+
+          return `
+            <div onclick="selectGovFromLegend('${g.replace(/'/g, "\\'")}')" class="p-3 rounded-xl border ${isSelected ? 'border-blue-500 bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'} transition cursor-pointer">
+              <div class="flex items-center justify-between text-xs mb-1.5">
+                <div class="flex items-center gap-2 font-bold text-slate-900">
+                  <span class="w-3 h-3 rounded-full" style="background:${c.bg}"></span>
+                  <span>รัฐบาล ${g}</span>
+                </div>
+                <div class="font-bold text-slate-900">${formatNumber(rep)} ครั้ง <span class="text-slate-500 font-normal">(${pct}%)</span></div>
+              </div>
+              <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden mb-1.5">
+                <div class="h-full rounded-full" style="width:${pct}%; background:${c.bg}"></div>
+              </div>
+              <div class="flex items-center justify-between text-xs text-slate-500">
+                <span>จำนวนนโยบาย: <strong class="text-slate-700">${formatNumber(pol)}</strong> เรื่อง</span>
+                <span>ความถี่เฉลี่ย: <strong class="text-slate-700">${pol > 0 ? (rep / pol).toFixed(2) : '0.00'}</strong> ครั้ง/นโยบาย</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // 3. Yearly Breakdown Widget
+      const yearWidget = document.getElementById('yearlyBreakdownWidget');
+      if (yearWidget) {
+        const baseTb = appData.tablesByGov[uiState.selectedGov] || appData.tablesByGov['ALL'];
+        const yearStats = appData.allYears.map(y => {
+          let sumY = 0;
+          let activeMonthsY = 0;
+          appData.allYearMonths.filter(ym => ym.year === y).forEach(ym => {
+            const v = baseTb.totalRow.monthly[ym.key] || 0;
+            if (v > 0) {
+              sumY += v;
+              activeMonthsY++;
+            }
+          });
+          return { year: y, total: sumY, activeMonths: activeMonthsY };
+        });
+
+        const maxYearTotal = Math.max(1, ...yearStats.map(ys => ys.total));
+        yearWidget.innerHTML = yearStats.map(ys => {
+          const w = ((ys.total / maxYearTotal) * 100).toFixed(1);
+          const avg = ys.activeMonths > 0 ? Math.round(ys.total / ys.activeMonths) : 0;
+          return `
+            <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200/80">
+              <div class="flex items-center justify-between text-xs mb-1">
+                <span class="font-bold text-slate-800">ปี พ.ศ. ${ys.year} <span class="font-normal text-slate-500">(${ys.activeMonths} เดือนที่มีรายงาน)</span></span>
+                <span class="font-bold text-blue-700">${formatNumber(ys.total)} ครั้ง <span class="text-slate-500 font-normal">(เฉลี่ย ${formatNumber(avg)}/เดือน)</span></span>
+              </div>
+              <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-600 rounded-full" style="width:${w}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    function openMinistryDrillFromOverview(ministryName) {
+      uiState.drillMinistry = ministryName;
+      const drillSel = document.getElementById('drillMinistrySelect');
+      if (drillSel) drillSel.value = ministryName;
+      switchTab('ministryDrill');
+    }
+
+    // =========================================================================
+    // 6. TAB 2: CROSS-GOVERNMENT COMPARISON RENDERERS
+    // =========================================================================
+    function renderGovComparisonTab() {
+      renderGovScorecards();
+      renderHeadToHead();
+      renderGovComparisonMatrix();
+    }
+
+    function renderGovScorecards() {
+      const grid = document.getElementById('govScorecardsGrid');
+      if (!grid || !appData.comparisonMatrix) return;
+
+      const comp = appData.comparisonMatrix;
+      const grandTotal = Math.max(1, comp.grandTotal);
+
+      grid.innerHTML = comp.governments.map((g, idx) => {
+        const tb = appData.tablesByGov[g];
+        const totalRep = comp.totalByGov[g] || (tb ? tb.totalRow.totalReports : 0);
+        const totalPol = tb ? tb.totalRow.policies : 0;
+        const sharePct = ((totalRep / grandTotal) * 100).toFixed(1);
+        const intensity = totalPol > 0 ? (totalRep / totalPol).toFixed(2) : '0.00';
+        const c = getGovColor(g);
+
+        // Active months & period
+        let activeMonths = 0;
+        let firstM = '-';
+        let lastM = '-';
+        if (tb) {
+          const activeYMs = tb.yearMonths.filter(ym => (tb.totalRow.monthly[ym.key] || 0) > 0);
+          activeMonths = activeYMs.length;
+          if (activeYMs.length > 0) {
+            firstM = activeYMs[0].label;
+            lastM = activeYMs[activeYMs.length - 1].label;
+          }
+        }
+        const avgPerActiveMonth = activeMonths > 0 ? Math.round(totalRep / activeMonths) : 0;
+
+        // Top 3 ministries for this government
+        const topMins = tb
+          ? [...tb.ministries].sort((a, b) => b.totalReports - a.totalReports).slice(0, 3)
+          : [];
+
+        return `
+          <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-xs flex flex-col justify-between print-card" style="border-top: 4px solid ${c.bg}">
+            <div>
+              <div class="flex items-center justify-between gap-1">
+                <span class="text-xs font-bold px-2 py-0.5 rounded-full ${c.badge}">รัฐบาลที่ ${idx + 1}</span>
+                <span class="text-xs font-semibold text-slate-500">${firstM} – ${lastM}</span>
+              </div>
+              <h3 class="text-sm sm:text-base font-bold text-slate-900 mt-2 truncate" title="รัฐบาล ${g}">รัฐบาล ${g}</h3>
+
+              <div class="mt-3 p-2.5 rounded-lg bg-slate-50 border border-slate-100">
+                <div class="text-xs text-slate-500">รวมครั้งที่รายงาน</div>
+                <div class="text-xl font-bold font-heading" style="color:${c.bg}">${formatNumber(totalRep)} <span class="text-xs font-normal text-slate-600">ครั้ง (${sharePct}%)</span></div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-2 mt-2.5 text-xs">
+                <div class="p-2 rounded bg-slate-50 border border-slate-100">
+                  <div class="text-slate-500">จำนวนนโยบาย</div>
+                  <div class="font-bold text-slate-800 mt-0.5">${formatNumber(totalPol)} เรื่อง</div>
+                </div>
+                <div class="p-2 rounded bg-slate-50 border border-slate-100">
+                  <div class="text-slate-500">ครั้ง/นโยบาย</div>
+                  <div class="font-bold text-slate-800 mt-0.5">${intensity} เท่า</div>
+                </div>
+                <div class="p-2 rounded bg-slate-50 border border-slate-100">
+                  <div class="text-slate-500">เดือนที่รายงาน</div>
+                  <div class="font-bold text-slate-800 mt-0.5">${activeMonths} เดือน</div>
+                </div>
+                <div class="p-2 rounded bg-slate-50 border border-slate-100">
+                  <div class="text-slate-500">เฉลี่ย/เดือน</div>
+                  <div class="font-bold text-slate-800 mt-0.5">${formatNumber(avgPerActiveMonth)} ครั้ง</div>
+                </div>
+              </div>
+
+              <div class="mt-3 pt-2.5 border-t border-slate-100">
+                <div class="text-xs font-semibold text-slate-600 mb-1.5">3 อันดับกระทรวงสูงสุด:</div>
+                <div class="space-y-1 text-xs">
+                  ${topMins.map((m, i) => `
+                    <div class="flex items-center justify-between gap-1">
+                      <span class="truncate text-slate-700">${i + 1}. ${m.name}</span>
+                      <span class="font-bold text-slate-900 shrink-0">${formatNumber(m.totalReports)}</span>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            </div>
+
+            <button onclick="selectGovAndSwitchOverview('${g.replace(/'/g, "\\'")}')" class="mt-3 w-full py-1.5 rounded-lg text-xs font-semibold border border-slate-200 hover:bg-slate-100 text-slate-700 transition no-print cursor-pointer">
+              ดูเจาะลึกรัฐบาลนี้ →
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function selectGovAndSwitchOverview(govName) {
+      uiState.selectedGov = govName;
+      const sel = document.getElementById('globalGovFilter');
+      if (sel) sel.value = govName;
+      switchTab('overview');
+    }
+
+    function renderHeadToHead() {
+      const container = document.getElementById('headToHeadContainer');
+      const selA = document.getElementById('h2hGovA');
+      const selB = document.getElementById('h2hGovB');
+      if (!container || !selA || !selB || !appData.comparisonMatrix) return;
+
+      const govA = selA.value;
+      const govB = selB.value;
+      const tbA = appData.tablesByGov[govA];
+      const tbB = appData.tablesByGov[govB];
+      const comp = appData.comparisonMatrix;
+
+      const repA = comp.totalByGov[govA] || 0;
+      const repB = comp.totalByGov[govB] || 0;
+      const polA = tbA ? tbA.totalRow.policies : 0;
+      const polB = tbB ? tbB.totalRow.policies : 0;
+      const diffRep = repB - repA;
+      const diffPol = polB - polA;
+
+      const rows = comp.rows.map(r => {
+        const a = r.byGov[govA] || 0;
+        const b = r.byGov[govB] || 0;
+        return {
+          ministry: r.ministry,
+          a,
+          b,
+          delta: b - a,
+          sum: a + b
+        };
+      }).filter(r => r.sum > 0).sort((x, y) => y.sum - x.sum);
+
+      const maxSide = Math.max(1, ...rows.map(r => Math.max(r.a, r.b)));
+
+      container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+          <div class="p-3.5 rounded-xl bg-blue-50/70 border border-blue-200">
+            <div class="text-xs font-semibold text-blue-800">รัฐบาลตั้งต้น (A): ${govA}</div>
+            <div class="text-xl font-bold text-blue-950 mt-1">${formatNumber(repA)} ครั้ง <span class="text-xs font-normal text-blue-800">(${formatNumber(polA)} นโยบาย)</span></div>
+          </div>
+          <div class="p-3.5 rounded-xl bg-amber-50/70 border border-amber-200">
+            <div class="text-xs font-semibold text-amber-900">รัฐบาลเปรียบเทียบ (B): ${govB}</div>
+            <div class="text-xl font-bold text-amber-950 mt-1">${formatNumber(repB)} ครั้ง <span class="text-xs font-normal text-amber-800">(${formatNumber(polB)} นโยบาย)</span></div>
+          </div>
+          <div class="p-3.5 rounded-xl bg-slate-100 border border-slate-200">
+            <div class="text-xs font-semibold text-slate-700">ผลต่าง (B เทียบกับ A)</div>
+            <div class="text-xl font-bold ${diffRep >= 0 ? 'text-emerald-700' : 'text-rose-700'} mt-1">
+              ${diffRep >= 0 ? '+' : ''}${formatNumber(diffRep)} ครั้ง
+              <span class="text-xs font-normal text-slate-600">(${diffPol >= 0 ? '+' : ''}${formatNumber(diffPol)} นโยบาย)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2 max-h-[420px] overflow-y-auto pr-1">
+          ${rows.slice(0, 15).map(r => {
+            const wA = ((r.a / maxSide) * 100).toFixed(1);
+            const wB = ((r.b / maxSide) * 100).toFixed(1);
+            const dBadge = r.delta > 0
+              ? `<span class="text-emerald-700 font-semibold">+${formatNumber(r.delta)}</span>`
+              : (r.delta < 0 ? `<span class="text-rose-700 font-semibold">${formatNumber(r.delta)}</span>` : `<span class="text-slate-400">0</span>`);
+            return `
+              <div class="grid grid-cols-12 items-center gap-2 text-xs py-1.5 border-b border-slate-100">
+                <div class="col-span-12 sm:col-span-4 font-semibold text-slate-800 truncate" title="${r.ministry}">${r.ministry}</div>
+                <div class="col-span-5 sm:col-span-3 flex items-center justify-end gap-2">
+                  <span class="font-bold text-blue-800">${formatNumber(r.a)}</span>
+                  <div class="w-24 h-2.5 bg-slate-100 rounded-full overflow-hidden flex justify-end">
+                    <div class="h-full bg-blue-600 rounded-full" style="width:${wA}%"></div>
+                  </div>
+                </div>
+                <div class="col-span-5 sm:col-span-3 flex items-center gap-2">
+                  <div class="w-24 h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-amber-500 rounded-full" style="width:${wB}%"></div>
+                  </div>
+                  <span class="font-bold text-amber-800">${formatNumber(r.b)}</span>
+                </div>
+                <div class="col-span-2 text-right">${dBadge}</div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function renderGovComparisonMatrix() {
+      const container = document.getElementById('govComparisonMatrixContainer');
+      const mode = (document.getElementById('govMatrixDisplayMode') || {}).value || 'count';
+      if (!container || !appData.comparisonMatrix) return;
+
+      const comp = appData.comparisonMatrix;
+      const govs = comp.governments;
+      const maxCell = Math.max(1, ...comp.rows.flatMap(r => govs.map(g => r.byGov[g] || 0)));
+
+      let html = `
+        <table class="w-full text-xs text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-900 text-white">
+              <th class="py-2.5 px-3 font-semibold border border-slate-700">ลำดับ</th>
+              <th class="py-2.5 px-3 font-semibold border border-slate-700 min-w-[240px]">กระทรวง / หน่วยงานหลัก</th>
+              ${govs.map(g => `<th class="py-2.5 px-3 font-semibold text-right border border-slate-700">${g}</th>`).join('')}
+              <th class="py-2.5 px-3 font-bold text-right bg-slate-800 border border-slate-700">รวมทั้งหมด</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      comp.rows.forEach((r, idx) => {
+        const rowTotal = Math.max(1, r.total);
+        html += `<tr class="border-b border-slate-200 hover:bg-blue-50/40 transition">`;
+        html += `<td class="py-2 px-3 text-slate-500 font-medium border border-slate-200">${idx + 1}</td>`;
+        html += `
+          <td class="py-2 px-3 font-semibold text-slate-900 border border-slate-200">
+            <button onclick="openMinistryDrillFromOverview('${r.ministry.replace(/'/g, "\\'")}')" class="text-left hover:text-blue-600 hover:underline cursor-pointer">
+              ${r.ministry}
+            </button>
+          </td>
+        `;
+
+        govs.forEach(g => {
+          const count = r.byGov[g] || 0;
+          const pol = (r.policiesByGov && r.policiesByGov[g]) || 0;
+          const colTotal = Math.max(1, comp.totalByGov[g] || 1);
+          let displayStr = '-';
+          if (mode === 'count') {
+            displayStr = count > 0 ? formatNumber(count) : '-';
+          } else if (mode === 'rowPct') {
+            displayStr = count > 0 ? `${((count / rowTotal) * 100).toFixed(1)}%` : '-';
+          } else if (mode === 'colPct') {
+            displayStr = count > 0 ? `${((count / colTotal) * 100).toFixed(1)}%` : '-';
+          } else if (mode === 'policies') {
+            displayStr = pol > 0 ? `${formatNumber(pol)} เรื่อง` : '-';
+          }
+
+          const alpha = count > 0 ? Math.min(0.38, 0.05 + (count / maxCell) * 0.35) : 0;
+          const bgStyle = count > 0 ? `background-color: rgba(37, 99, 235, ${alpha.toFixed(2)});` : '';
+          html += `<td class="py-2 px-3 text-right font-medium text-slate-800 border border-slate-200" style="${bgStyle}">${displayStr}</td>`;
+        });
+
+        html += `<td class="py-2 px-3 text-right font-bold text-blue-900 bg-slate-50 border border-slate-200">${formatNumber(r.total)}</td>`;
+        html += `</tr>`;
+      });
+
+      // Footer Total Row
+      html += `
+          </tbody>
+          <tfoot>
+            <tr class="bg-slate-100 font-bold text-slate-900 border-t-2 border-slate-300">
+              <td colspan="2" class="py-2.5 px-3 border border-slate-300">รวมทั้งหมด (27 กระทรวง/หน่วยงานหลัก)</td>
+              ${govs.map(g => `<td class="py-2.5 px-3 text-right border border-slate-300 text-blue-900">${formatNumber(comp.totalByGov[g] || 0)}</td>`).join('')}
+              <td class="py-2.5 px-3 text-right bg-blue-900 text-white border border-slate-800">${formatNumber(comp.grandTotal)}</td>
+            </tr>
+          </tfoot>
+        </table>
+      `;
+
+      container.innerHTML = html;
+    }
+
+    // =========================================================================
+    // 7. TAB 3: MINISTRY & DEPARTMENT DRILL-DOWN EXPLORER
+    // =========================================================================
+    function onDrillMinistrySelect(ministryName) {
+      uiState.drillMinistry = ministryName;
+      renderMinistryDrillTab();
+    }
+
+    function renderMinistryDrillTab() {
+      const container = document.getElementById('ministryDrillContent');
+      if (!container) return;
+
+      const minName = uiState.drillMinistry || appData.allMinistries[0];
+      const baseTable = appData.tablesByGov[uiState.selectedGov] || appData.tablesByGov['ALL'];
+      const minObj = baseTable ? baseTable.ministries.find(m => m.name === minName) : null;
+
+      if (!minObj) {
+        container.innerHTML = `<div class="p-8 text-center text-sm text-slate-500">ไม่พบข้อมูลของ ${minName} ในรัฐบาลที่เลือก (ลองเปลี่ยนตัวกรองรัฐบาลด้านบนเป็น "ทุกรัฐบาล")</div>`;
+        return;
+      }
+
+      // Cross-government breakdown for this specific ministry
+      const govBreakdown = appData.governments.map(g => {
+        const tb = appData.tablesByGov[g];
+        const mInG = tb ? tb.ministries.find(x => x.name === minName) : null;
+        return {
+          gov: g,
+          reports: mInG ? mInG.totalReports : 0,
+          policies: mInG ? mInG.policies : 0
+        };
+      });
+
+      const depts = [...minObj.departments].sort((a, b) => b.totalReports - a.totalReports);
+      const maxDeptRep = Math.max(1, ...depts.map(d => d.totalReports));
+
+      container.innerHTML = `
+        <!-- Ministry Summary Header Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div class="p-4 rounded-xl bg-blue-50/70 border border-blue-200">
+            <div class="text-xs font-semibold text-blue-800">รวมครั้งที่รายงาน (${uiState.selectedGov === 'ALL' ? 'ทุกรัฐบาล' : uiState.selectedGov})</div>
+            <div class="text-2xl font-bold text-blue-950 mt-1">${formatNumber(minObj.totalReports)} ครั้ง</div>
+          </div>
+          <div class="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200">
+            <div class="text-xs font-semibold text-emerald-800">จำนวนนโยบาย/ข้อสั่งการที่รับผิดชอบ</div>
+            <div class="text-2xl font-bold text-emerald-950 mt-1">${formatNumber(minObj.policies)} นโยบาย</div>
+          </div>
+          <div class="p-4 rounded-xl bg-amber-50/70 border border-amber-200">
+            <div class="text-xs font-semibold text-amber-800">ความถี่เฉลี่ยต่อนโยบาย</div>
+            <div class="text-2xl font-bold text-amber-950 mt-1">${minObj.policies > 0 ? (minObj.totalReports / minObj.policies).toFixed(2) : '0.00'} ครั้ง/นโยบาย</div>
+          </div>
+          <div class="p-4 rounded-xl bg-purple-50/70 border border-purple-200">
+            <div class="text-xs font-semibold text-purple-800">จำนวนหน่วยงานย่อย/กรมในสังกัดที่รายงาน</div>
+            <div class="text-2xl font-bold text-purple-950 mt-1">${depts.length} หน่วยงาน</div>
+          </div>
+        </div>
+
+        <!-- Comparison across 5 Governments for this Ministry -->
+        <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/60">
+          <h3 class="text-sm font-bold text-slate-900 mb-3">การรายงานผลของ "${minName}" เปรียบเทียบรายรัฐบาล</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            ${govBreakdown.map(gb => {
+              const c = getGovColor(gb.gov);
+              return `
+                <div class="p-3 rounded-lg bg-white border border-slate-200 shadow-2xs" style="border-left: 4px solid ${c.bg}">
+                  <div class="text-xs font-semibold text-slate-600 truncate">${gb.gov}</div>
+                  <div class="text-base font-bold text-slate-900 mt-1">${formatNumber(gb.reports)} ครั้ง</div>
+                  <div class="text-xs text-slate-500">${formatNumber(gb.policies)} นโยบาย</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+
+        <!-- Department / Sub-agency Table & Bars -->
+        <div>
+          <h3 class="text-sm sm:text-base font-bold text-slate-900 mb-2">ตารางเจาะลึกระดับกรม / หน่วยงานในสังกัด (${depts.length} หน่วยงาน)</h3>
+          <div class="overflow-x-auto border border-slate-200 rounded-xl">
+            <table class="w-full text-xs text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-900 text-white">
+                  <th class="py-2.5 px-3 border border-slate-700 w-12">ลำดับ</th>
+                  <th class="py-2.5 px-3 border border-slate-700">กรม / หน่วยงานในสังกัด</th>
+                  <th class="py-2.5 px-3 border border-slate-700 text-right">จำนวนนโยบาย</th>
+                  <th class="py-2.5 px-3 border border-slate-700 text-right">รวมครั้งที่รายงาน</th>
+                  <th class="py-2.5 px-3 border border-slate-700 text-right">ครั้ง/นโยบาย</th>
+                  <th class="py-2.5 px-3 border border-slate-700 w-56">สัดส่วนในกระทรวง (%)</th>
+                  <th class="py-2.5 px-3 border border-slate-700 text-center no-print">แนวโน้มรายเดือน</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${depts.map((d, i) => {
+                  const pct = minObj.totalReports > 0 ? ((d.totalReports / minObj.totalReports) * 100).toFixed(1) : '0.0';
+                  const barW = ((d.totalReports / maxDeptRep) * 100).toFixed(1);
+                  const ratio = d.policies > 0 ? (d.totalReports / d.policies).toFixed(2) : '0.00';
+                  return `
+                    <tr class="border-b border-slate-200 hover:bg-blue-50/40 transition">
+                      <td class="py-2 px-3 text-slate-500 border border-slate-200">${i + 1}</td>
+                      <td class="py-2 px-3 font-semibold text-slate-900 border border-slate-200">${d.name}</td>
+                      <td class="py-2 px-3 text-right text-slate-700 border border-slate-200">${formatNumber(d.policies)}</td>
+                      <td class="py-2 px-3 text-right font-bold text-blue-700 border border-slate-200">${formatNumber(d.totalReports)}</td>
+                      <td class="py-2 px-3 text-right text-amber-800 border border-slate-200">${ratio}</td>
+                      <td class="py-2 px-3 border border-slate-200">
+                        <div class="flex items-center gap-2">
+                          <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                            <div class="h-full bg-blue-600 rounded-full" style="width:${barW}%"></div>
+                          </div>
+                          <span class="font-semibold text-slate-700 w-12 text-right">${pct}%</span>
+                        </div>
+                      </td>
+                      <td class="py-2 px-3 text-center border border-slate-200 no-print">
+                        <button onclick="openAgencyModal('${minName.replace(/'/g, "\\'")}', '${d.name.replace(/'/g, "\\'")}')" class="px-2.5 py-1 rounded bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold transition cursor-pointer">
+                          ดูกราฟรายเดือน
+                        </button>
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+    }
+
+    // =========================================================================
+    // 8. TAB 4: FULL MONTHLY MATRIX TABLE (PMONE-1020)
+    // =========================================================================
+    function toggleMatrixMinistry(minName) {
+      if (uiState.expandedMinistries.has(minName)) {
+        uiState.expandedMinistries.delete(minName);
+      } else {
+        uiState.expandedMinistries.add(minName);
+      }
+      renderMonthlyMatrixTable();
+    }
+
+    function toggleAllMatrixMinistries(expand) {
+      if (expand) {
+        appData.allMinistries.forEach(m => uiState.expandedMinistries.add(m));
+      } else {
+        uiState.expandedMinistries.clear();
+      }
+      renderMonthlyMatrixTable();
+    }
+
+    function renderMonthlyMatrixTable() {
+      const wrapper = document.getElementById('monthlyMatrixTableWrapper');
+      const heading = document.getElementById('matrixTableHeading');
+      const showHeatmap = (document.getElementById('matrixHeatmapToggle') || {}).checked !== false;
+      if (!wrapper) return;
+
+      const activeData = getActiveTableData();
+      if (!activeData) return;
+
+      const govTitle = uiState.selectedGov === 'ALL' ? 'ทุกรัฐบาล' : `รัฐบาล ${uiState.selectedGov}`;
+      const yearTitle = uiState.selectedYear === 'ALL' ? 'ทุกปี พ.ศ.' : `ปี พ.ศ. ${uiState.selectedYear}`;
+      if (heading) {
+        heading.textContent = `PMONE-1020 · จำนวนครั้งที่หน่วยงานรายงานผลนโยบาย แยกกระทรวง/กรม รายเดือน (${govTitle} · ${yearTitle})`;
+      }
+
+      const yms = activeData.yearMonths;
+      // Group yearMonths by year for top header row
+      const yearGroups = [];
+      yms.forEach(ym => {
+        const last = yearGroups[yearGroups.length - 1];
+        if (!last || last.year !== ym.year) {
+          yearGroups.push({ year: ym.year, count: 1 });
+        } else {
+          last.count++;
+        }
+      });
+
+      // Find max monthly cell for heatmap scaling
+      let maxCell = 10;
+      activeData.ministries.forEach(m => {
+        yms.forEach(ym => {
+          const v = m.filteredMonthly[ym.key] || 0;
+          if (v > maxCell) maxCell = v;
+        });
+      });
+
+      let html = `
+        <table class="w-full text-xs text-left border-collapse">
+          <thead class="sticky top-0 z-20">
+            <tr class="bg-slate-900 text-white">
+              <th rowspan="2" class="py-2.5 px-3 font-semibold border border-slate-700 min-w-[260px] bg-slate-900 sticky-col-1">กระทรวง / กรม</th>
+              <th rowspan="2" class="py-2.5 px-2.5 font-semibold text-right border border-slate-700 min-w-[90px] bg-slate-900">จำนวนนโยบาย</th>
+              <th rowspan="2" class="py-2.5 px-2.5 font-bold text-right border border-slate-700 min-w-[95px] bg-slate-800 text-amber-300">รวมครั้งที่รายงาน</th>
+              ${yearGroups.map(yg => `<th colspan="${yg.count}" class="py-1.5 px-2 font-bold text-center border border-slate-700 bg-blue-950 text-blue-200">พ.ศ. ${yg.year}</th>`).join('')}
+              <th rowspan="2" class="py-2.5 px-2 font-semibold text-center border border-slate-700 bg-slate-900 no-print">กราฟ</th>
+            </tr>
+            <tr class="bg-slate-800 text-slate-200">
+              ${yms.map(ym => `<th class="py-1.5 px-2 font-medium text-right border border-slate-700 whitespace-nowrap">${THAI_MONTH_SHORT[ym.month] || ym.month}</th>`).join('')}
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      activeData.ministries.forEach(min => {
+        const isExpanded = uiState.expandedMinistries.has(min.name) || Boolean(uiState.searchQuery);
+        const hasDepts = min.filteredDepartments && min.filteredDepartments.length > 0;
+
+        // Ministry Parent Row
+        html += `<tr class="bg-slate-100/90 hover:bg-blue-50/70 font-bold text-slate-900 border-b border-slate-300">`;
+        html += `
+          <td class="py-2 px-3 border border-slate-200 bg-slate-100 sticky-col-1">
+            <button onclick="toggleMatrixMinistry('${min.name.replace(/'/g, "\\'")}')" class="inline-flex items-center gap-1.5 text-left hover:text-blue-700 cursor-pointer">
+              <span class="w-4 h-4 rounded bg-slate-300 text-slate-800 flex items-center justify-center text-xs font-mono">${isExpanded ? '−' : '+'}</span>
+              <span>${min.name}</span>
+            </button>
+          </td>
+          <td class="py-2 px-2.5 text-right border border-slate-200">${formatNumber(min.policies)}</td>
+          <td class="py-2 px-2.5 text-right border border-slate-200 bg-blue-50/60 text-blue-900">${formatNumber(min.filteredReports)}</td>
+        `;
+
+        yms.forEach(ym => {
+          const val = min.filteredMonthly[ym.key] || 0;
+          const alpha = (showHeatmap && val > 0) ? Math.min(0.45, 0.08 + (val / maxCell) * 0.4) : 0;
+          const style = alpha > 0 ? `background-color: rgba(37, 99, 235, ${alpha.toFixed(2)});` : '';
+          html += `<td class="py-2 px-2 text-right border border-slate-200" style="${style}">${val > 0 ? formatNumber(val) : ''}</td>`;
+        });
+
+        html += `
+          <td class="py-2 px-2 text-center border border-slate-200 no-print">
+            <button onclick="openAgencyModal('${min.name.replace(/'/g, "\\'")}', null)" title="ดูกราฟรายเดือน" class="px-2 py-0.5 rounded bg-blue-600 text-white hover:bg-blue-500 text-xs cursor-pointer">กราฟ</button>
+          </td>
+        </tr>`;
+
+        // Department Child Rows
+        if (isExpanded && hasDepts) {
+          min.filteredDepartments.forEach(dept => {
+            html += `<tr class="bg-white hover:bg-slate-50 text-slate-700 border-b border-slate-100">`;
+            html += `
+              <td class="py-1.5 pl-8 pr-3 border border-slate-200 bg-white sticky-col-1 text-slate-700">
+                ↳ ${dept.name}
+              </td>
+              <td class="py-1.5 px-2.5 text-right border border-slate-200">${formatNumber(dept.policies)}</td>
+              <td class="py-1.5 px-2.5 text-right font-semibold text-slate-900 border border-slate-200 bg-slate-50/60">${formatNumber(dept.filteredReports)}</td>
+            `;
+            yms.forEach(ym => {
+              const dVal = dept.filteredMonthly[ym.key] || 0;
+              const alpha = (showHeatmap && dVal > 0) ? Math.min(0.35, 0.06 + (dVal / maxCell) * 0.32) : 0;
+              const style = alpha > 0 ? `background-color: rgba(16, 185, 129, ${alpha.toFixed(2)});` : '';
+              html += `<td class="py-1.5 px-2 text-right border border-slate-200" style="${style}">${dVal > 0 ? formatNumber(dVal) : ''}</td>`;
+            });
+            html += `
+              <td class="py-1.5 px-2 text-center border border-slate-200 no-print">
+                <button onclick="openAgencyModal('${min.name.replace(/'/g, "\\'")}', '${dept.name.replace(/'/g, "\\'")}')" class="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs cursor-pointer">ดู</button>
+              </td>
+            </tr>`;
+          });
+        }
+      });
+
+      // Footer Total Row
+      html += `
+          </tbody>
+          <tfoot>
+            <tr class="bg-slate-900 text-white font-bold">
+              <td class="py-2.5 px-3 border border-slate-700 bg-slate-900 sticky-col-1">รวมทั้งหมด</td>
+              <td class="py-2.5 px-2.5 text-right border border-slate-700">${formatNumber(activeData.totalPolicies)}</td>
+              <td class="py-2.5 px-2.5 text-right border border-slate-700 bg-amber-500 text-slate-950">${formatNumber(activeData.totalReports)}</td>
+              ${yms.map(ym => {
+                const mTot = activeData.monthlyTotals[ym.key] || 0;
+                return `<td class="py-2.5 px-2 text-right border border-slate-700">${mTot > 0 ? formatNumber(mTot) : ''}</td>`;
+              }).join('')}
+              <td class="py-2.5 px-2 border border-slate-700 no-print"></td>
+            </tr>
+          </tfoot>
+        </table>
+      `;
+
+      wrapper.innerHTML = html;
+    }
+
+    // =========================================================================
+    // 9. AGENCY DEEP-DIVE MODAL
+    // =========================================================================
+    function openAgencyModal(ministryName, deptName) {
+      const modal = document.getElementById('agencyModal');
+      const titleEl = document.getElementById('modalAgencyTitle');
+      const badgeEl = document.getElementById('modalAgencyTypeBadge');
+      const bodyEl = document.getElementById('modalAgencyBody');
+      if (!modal || !bodyEl) return;
+
+      const baseTable = appData.tablesByGov[uiState.selectedGov] || appData.tablesByGov['ALL'];
+      const minObj = baseTable.ministries.find(m => m.name === ministryName);
+      if (!minObj) return;
+
+      const targetObj = deptName
+        ? minObj.departments.find(d => d.name === deptName)
+        : minObj;
+      if (!targetObj) return;
+
+      badgeEl.textContent = deptName ? `หน่วยงานระดับกรม · สังกัด${ministryName}` : `หน่วยงานระดับกระทรวงหลัก`;
+      titleEl.textContent = deptName ? `${deptName}` : `${ministryName}`;
+
+      const yms = baseTable.yearMonths;
+      const monthVals = yms.map(ym => ({
+        ...ym,
+        val: targetObj.monthly[ym.key] || 0
+      }));
+      const maxVal = Math.max(5, ...monthVals.map(m => m.val));
+      const activeMonths = monthVals.filter(m => m.val > 0);
+
+      // Build mini SVG bar chart for modal
+      const svgW = Math.max(680, monthVals.length * 22 + 60);
+      const svgH = 210;
+      const pL = 40, pR = 16, pT = 20, pB = 50;
+      const plotW = svgW - pL - pR;
+      const plotH = svgH - pT - pB;
+      const stepX = plotW / Math.max(1, monthVals.length);
+      const barW = Math.min(18, Math.max(8, stepX * 0.65));
+
+      let barsSvg = '';
+      monthVals.forEach((mv, idx) => {
+        const cx = pL + idx * stepX + stepX / 2;
+        const h = (mv.val / maxVal) * plotH;
+        const y = pT + plotH - h;
+        if (mv.val > 0) {
+          barsSvg += `
+            <rect x="${(cx - barW / 2).toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(2, h).toFixed(1)}" fill="#2563eb" rx="2">
+              <title>${mv.month} ${mv.year}: ${formatNumber(mv.val)} ครั้ง</title>
+            </rect>
+            <text x="${cx.toFixed(1)}" y="${Math.max(11, y - 4).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="600" fill="#1e40af">${mv.val}</text>
+          `;
+        }
+        barsSvg += `
+          <g transform="translate(${cx.toFixed(1)}, ${pT + plotH + 12})">
+            <text transform="rotate(-40)" text-anchor="end" font-size="9.5" fill="#475569">${mv.label}</text>
+          </g>
+        `;
+      });
+
+      bodyEl.innerHTML = `
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="p-3.5 rounded-xl bg-blue-50 border border-blue-200">
+            <div class="text-xs text-blue-800">รวมครั้งที่รายงาน</div>
+            <div class="text-xl font-bold text-blue-950 mt-0.5">${formatNumber(targetObj.totalReports)} ครั้ง</div>
+          </div>
+          <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200">
+            <div class="text-xs text-emerald-800">จำนวนนโยบาย/ข้อสั่งการ</div>
+            <div class="text-xl font-bold text-emerald-950 mt-0.5">${formatNumber(targetObj.policies)} เรื่อง</div>
+          </div>
+          <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200">
+            <div class="text-xs text-amber-800">จำนวนเดือนที่มีการรายงาน</div>
+            <div class="text-xl font-bold text-amber-950 mt-0.5">${activeMonths.length} เดือน</div>
+          </div>
+        </div>
+
+        <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/50 overflow-x-auto">
+          <div class="text-xs font-bold text-slate-700 mb-2">กราฟความถี่การรายงานรายเดือน (${uiState.selectedGov === 'ALL' ? 'ทุกรัฐบาล' : uiState.selectedGov})</div>
+          <svg viewBox="0 0 ${svgW} ${svgH}" class="w-full h-auto min-w-[600px]">
+            <line x1="${pL}" y1="${pT + plotH}" x2="${svgW - pR}" y2="${pT + plotH}" stroke="#cbd5e1" />
+            ${barsSvg}
+          </svg>
+        </div>
+
+        <div>
+          <div class="text-xs font-bold text-slate-700 mb-2">รายการเดือนที่มีการรายงานผล (${activeMonths.length} เดือน):</div>
+          <div class="flex flex-wrap gap-2">
+            ${activeMonths.map(am => `
+              <span class="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-700">
+                ${am.month} ${am.year}: <strong class="text-blue-700">${formatNumber(am.val)} ครั้ง</strong>
+              </span>
+            `).join('')}
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeAgencyModal() {
+      const modal = document.getElementById('agencyModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    // =========================================================================
+    // 10. TAB 5: DATA IMPORT, QUICK ENTRY & EXPORT ENGINE
+    // =========================================================================
+    function openImportModal() {
+      switchTab('dataManage');
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const content = e.target.result;
+        const pasteBox = document.getElementById('rawPasteInput');
+        if (pasteBox) pasteBox.value = content;
+        const msg = document.getElementById('importFeedbackMsg');
+        if (msg) {
+          msg.innerHTML = `<span class="text-blue-700 font-semibold">อ่านไฟล์ "${file.name}" สำเร็จ! กดปุ่ม "ประมวลผลและนำเข้าข้อมูล" เพื่ออัปเดตแดชบอร์ด</span>`;
+        }
+      };
+      reader.readAsText(file, 'UTF-8');
+    }
+
+    function mergeTableIntoAll(govTable) {
+      let allTb = appData.tablesByGov['ALL'];
+      if (!allTb) return;
+
+      // Ensure yearMonths exist in ALL
+      const existingYMKeys = new Set(allTb.yearMonths.map(ym => ym.key));
+      govTable.yearMonths.forEach(ym => {
+        if (!existingYMKeys.has(ym.key)) {
+          allTb.yearMonths.push({ ...ym });
+          existingYMKeys.add(ym.key);
+        }
+      });
+      allTb.yearMonths.sort((a, b) => a.sortKey - b.sortKey);
+
+      // Recompute ALL by summing across all governments in appData.governments
+      const minMap = new Map();
+      appData.governments.forEach(g => {
+        const tb = appData.tablesByGov[g];
+        if (!tb) return;
+        tb.ministries.forEach(m => {
+          if (!minMap.has(m.name)) {
+            minMap.set(m.name, {
+              name: m.name,
+              policies: 0,
+              totalReports: 0,
+              monthly: {},
+              deptMap: new Map()
+            });
+          }
+          const mEntry = minMap.get(m.name);
+          mEntry.policies += m.policies;
+          mEntry.totalReports += m.totalReports;
+          Object.entries(m.monthly).forEach(([k, v]) => {
+            mEntry.monthly[k] = (mEntry.monthly[k] || 0) + v;
+          });
+
+          m.departments.forEach(d => {
+            if (!mEntry.deptMap.has(d.name)) {
+              mEntry.deptMap.set(d.name, {
+                name: d.name,
+                ministryName: m.name,
+                policies: 0,
+                totalReports: 0,
+                monthly: {}
+              });
+            }
+            const dEntry = mEntry.deptMap.get(d.name);
+            dEntry.policies += d.policies;
+            dEntry.totalReports += d.totalReports;
+            Object.entries(d.monthly).forEach(([k, v]) => {
+              dEntry.monthly[k] = (dEntry.monthly[k] || 0) + v;
+            });
+          });
+        });
+      });
+
+      const newMinistries = [];
+      const newTotalMonthly = {};
+      let newTotalPol = 0;
+      let newTotalRep = 0;
+
+      Array.from(minMap.values())
+        .sort((a, b) => b.totalReports - a.totalReports)
+        .forEach(mEntry => {
+          newTotalPol += mEntry.policies;
+          newTotalRep += mEntry.totalReports;
+          Object.entries(mEntry.monthly).forEach(([k, v]) => {
+            newTotalMonthly[k] = (newTotalMonthly[k] || 0) + v;
+          });
+          newMinistries.push({
+            name: mEntry.name,
+            policies: mEntry.policies,
+            totalReports: mEntry.totalReports,
+            monthly: mEntry.monthly,
+            departments: Array.from(mEntry.deptMap.values()).sort((a, b) => b.totalReports - a.totalReports)
+          });
+        });
+
+      allTb.ministries = newMinistries;
+      allTb.totalRow = {
+        name: 'รวมทั้งหมด',
+        policies: newTotalPol,
+        totalReports: newTotalRep,
+        monthly: newTotalMonthly
+      };
+    }
+
+    function processRawImport() {
+      const rawText = (document.getElementById('rawPasteInput') || {}).value || '';
+      const mode = (document.getElementById('importModeSelect') || {}).value || 'auto';
+      const customGov = ((document.getElementById('importCustomGovName') || {}).value || '').trim();
+      const msgEl = document.getElementById('importFeedbackMsg');
+
+      if (!rawText.trim()) {
+        if (msgEl) msgEl.innerHTML = `<span class="text-rose-600 font-semibold">กรุณาเลือกไฟล์หรือวางข้อมูล CSV/JSON ก่อนกดนำเข้า</span>`;
+        return;
+      }
+
+      try {
+        // Check if JSON backup
+        if (rawText.trim().startsWith('{')) {
+          const jsonObj = JSON.parse(rawText);
+          if (jsonObj.governments && jsonObj.tablesByGov) {
+            appData.governments = jsonObj.governments;
+            appData.tablesByGov = jsonObj.tablesByGov;
+            rebuildDerivedAggregates();
+            saveAppDataToStorage();
+            populateFilterDropdowns();
+            refreshAllViews();
+            if (msgEl) msgEl.innerHTML = `<span class="text-emerald-600 font-bold">นำเข้าฐานข้อมูล JSON สำเร็จ!</span>`;
+            return;
+          }
+        }
+
+        const parsed = parseFullPMOneDataset(rawText);
+        const govKeys = Object.keys(parsed.tablesByGov);
+
+        if (mode === 'replaceAll' || (mode === 'auto' && govKeys.includes('ALL') && parsed.govOrder.length >= 2)) {
+          appData.governments = parsed.govOrder;
+          appData.tablesByGov = parsed.tablesByGov;
+          rebuildDerivedAggregates();
+          saveAppDataToStorage();
+          populateFilterDropdowns();
+          refreshAllViews();
+          if (msgEl) msgEl.innerHTML = `<span class="text-emerald-600 font-bold">อัปเดตชุดข้อมูลหลักทั้งหมดสำเร็จ (${appData.governments.length} รัฐบาล)!</span>`;
+        } else {
+          // Merge individual government table(s)
+          let importedCount = 0;
+          govKeys.forEach(gk => {
+            const tb = parsed.tablesByGov[gk];
+            const targetGovName = customGov || (gk === 'ALL' ? 'ข้อมูลนำเข้าใหม่' : gk);
+            tb.govKey = targetGovName;
+            appData.tablesByGov[targetGovName] = tb;
+            if (!appData.governments.includes(targetGovName)) {
+              appData.governments.push(targetGovName);
+            }
+            importedCount++;
+          });
+          if (importedCount > 0) {
+            mergeTableIntoAll(Object.values(parsed.tablesByGov)[0]);
+            rebuildDerivedAggregates();
+            saveAppDataToStorage();
+            populateFilterDropdowns();
+            refreshAllViews();
+            if (msgEl) msgEl.innerHTML = `<span class="text-emerald-600 font-bold">เพิ่ม/อัปเดตข้อมูลสำเร็จ (${importedCount} ตารางรัฐบาล)!</span>`;
+          } else {
+            if (msgEl) msgEl.innerHTML = `<span class="text-rose-600 font-semibold">ไม่พบโครงสร้างตารางที่ถูกต้อง กรุณาตรวจสอบรูปแบบ CSV</span>`;
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        if (msgEl) msgEl.innerHTML = `<span class="text-rose-600 font-semibold">เกิดข้อผิดพลาดในการแปลงข้อมูล: ${err.message}</span>`;
+      }
+    }
+
+    function loadDemoFutureGov() {
+      const sampleCSV = `รัฐบาล ตัวอย่างข้อมูลอนาคต (2570) · ครั้งที่รายงานผลนโยบาย แยกกระทรวง/กรม รายเดือน (เดือน = วันที่บันทึกรายงาน),,,,,,
+กระทรวง / กรม,จำนวนนโยบาย/ข้อสั่งการที่รายงาน,รวมครั้งที่รายงาน,2570,,,
+,,,มกราคม,กุมภาพันธ์,มีนาคม,เมษายน
+สำนักนายกรัฐมนตรี,55,160,40,45,35,40
+สำนักเลขาธิการนายกรัฐมนตรี,30,90,25,25,20,20
+สำนักงานสภาพัฒนาการเศรษฐกิจและสังคมแห่งชาติ,25,70,15,20,15,20
+กระทรวงการคลัง,42,130,30,35,35,30
+(ระดับกระทรวง/หน่วยงานหลักเอง),22,70,15,20,20,15
+สำนักงานเศรษฐกิจการคลัง,20,60,15,15,15,15
+กระทรวงดิจิทัลเพื่อเศรษฐกิจและสังคม,38,115,25,30,30,30
+(ระดับกระทรวง/หน่วยงานหลักเอง),25,75,15,20,20,20
+สำนักงานส่งเสริมเศรษฐกิจดิจิทัล,13,40,10,10,10,10
+กระทรวงพาณิชย์,35,105,25,25,30,25
+กรมการค้าภายใน,20,60,15,15,15,15
+กรมส่งเสริมการค้าระหว่างประเทศ,15,45,10,10,15,10
+รวมทั้งหมด,170,510,120,135,130,125`;
+
+      const pasteBox = document.getElementById('rawPasteInput');
+      if (pasteBox) pasteBox.value = sampleCSV;
+      processRawImport();
+    }
+
+    function submitQuickEntry() {
+      const govName = (document.getElementById('qeGovInput').value || '').trim();
+      const minName = (document.getElementById('qeMinistryInput').value || '').trim();
+      const deptName = (document.getElementById('qeDeptInput').value || '(ระดับกระทรวง/หน่วยงานหลักเอง)').trim();
+      const yearStr = (document.getElementById('qeYearInput').value || '2569').trim();
+      const monthName = (document.getElementById('qeMonthInput').value || 'พฤศจิกายน').trim();
+      const reportsAdd = parseInt(document.getElementById('qeReportsInput').value, 10) || 0;
+      const policiesAdd = parseInt(document.getElementById('qePoliciesInput').value, 10) || 0;
+
+      if (!govName || !minName || reportsAdd <= 0) {
+        alert('กรุณาระบุชื่อรัฐบาล ชื่อกระทรวง และจำนวนครั้งที่รายงานให้ครบถ้วน');
+        return;
+      }
+
+      const ymKey = `${yearStr}-${monthName}`;
+      const ymObj = {
+        key: ymKey,
+        year: yearStr,
+        month: monthName,
+        label: formatMonthShort(yearStr, monthName),
+        sortKey: getMonthSortKey(yearStr, monthName)
+      };
+
+      if (!appData.governments.includes(govName)) {
+        appData.governments.push(govName);
+      }
+      if (!appData.tablesByGov[govName]) {
+        appData.tablesByGov[govName] = {
+          govKey: govName,
+          title: `รัฐบาล ${govName}`,
+          yearMonths: [ymObj],
+          ministries: [],
+          totalRow: { name: 'รวมทั้งหมด', policies: 0, totalReports: 0, monthly: {} }
+        };
+      }
+
+      const tb = appData.tablesByGov[govName];
+      if (!tb.yearMonths.some(x => x.key === ymKey)) {
+        tb.yearMonths.push(ymObj);
+        tb.yearMonths.sort((a, b) => a.sortKey - b.sortKey);
+      }
+
+      let minObj = tb.ministries.find(m => m.name === minName);
+      if (!minObj) {
+        minObj = { name: minName, policies: 0, totalReports: 0, monthly: {}, departments: [] };
+        tb.ministries.push(minObj);
+      }
+      minObj.policies += policiesAdd;
+      minObj.totalReports += reportsAdd;
+      minObj.monthly[ymKey] = (minObj.monthly[ymKey] || 0) + reportsAdd;
+
+      let deptObj = minObj.departments.find(d => d.name === deptName);
+      if (!deptObj) {
+        deptObj = { name: deptName, ministryName: minName, policies: 0, totalReports: 0, monthly: {} };
+        minObj.departments.push(deptObj);
+      }
+      deptObj.policies += policiesAdd;
+      deptObj.totalReports += reportsAdd;
+      deptObj.monthly[ymKey] = (deptObj.monthly[ymKey] || 0) + reportsAdd;
+
+      tb.totalRow.policies += policiesAdd;
+      tb.totalRow.totalReports += reportsAdd;
+      tb.totalRow.monthly[ymKey] = (tb.totalRow.monthly[ymKey] || 0) + reportsAdd;
+
+      mergeTableIntoAll(tb);
+      rebuildDerivedAggregates();
+      saveAppDataToStorage();
+      populateFilterDropdowns();
+      refreshAllViews();
+
+      const msgEl = document.getElementById('importFeedbackMsg');
+      if (msgEl) {
+        msgEl.innerHTML = `<span class="text-emerald-600 font-bold">เพิ่มข้อมูล "${minName} (${deptName})" เดือน ${monthName} ${yearStr} จำนวน +${reportsAdd} ครั้ง สำเร็จ!</span>`;
+      }
+    }
+
+    function downloadSampleTemplate() {
+      const sample = `รัฐบาล ชื่อรัฐบาลใหม่ (2570) · ครั้งที่รายงานผลนโยบาย แยกกระทรวง/กรม รายเดือน (เดือน = วันที่บันทึกรายงาน),,,,,,
+กระทรวง / กรม,จำนวนนโยบาย/ข้อสั่งการที่รายงาน,รวมครั้งที่รายงาน,2570,,,
+,,,มกราคม,กุมภาพันธ์,มีนาคม,เมษายน
+สำนักนายกรัฐมนตรี,45,120,30,35,25,30
+สำนักเลขาธิการนายกรัฐมนตรี,25,70,20,20,15,15
+สำนักงานสภาพัฒนาการเศรษฐกิจและสังคมแห่งชาติ,20,50,10,15,10,15
+กระทรวงการคลัง,38,95,25,20,30,20
+(ระดับกระทรวง/หน่วยงานหลักเอง),20,50,15,10,15,10
+สำนักงานเศรษฐกิจการคลัง,18,45,10,10,15,10
+รวมทั้งหมด,83,215,55,55,55,50`;
+      triggerDownload(sample, 'pm1_import_template.csv', 'text/csv;charset=utf-8;');
+    }
+
+    function exportCurrentCSV() {
+      const activeData = getActiveTableData();
+      if (!activeData) return;
+      const yms = activeData.yearMonths;
+
+      const lines = [];
+      const govTitle = uiState.selectedGov === 'ALL' ? 'ทุกรัฐบาล' : `รัฐบาล ${uiState.selectedGov}`;
+      lines.push(`PMONE-1020 · จำนวนครั้งที่หน่วยงานรายงานผลนโยบายรัฐบาล แยกกระทรวง/กรม รายเดือน · ${govTitle}`);
+
+      // Header row 1 (Years)
+      let prevY = '';
+      const h1 = ['กระทรวง / กรม', 'จำนวนนโยบาย/ข้อสั่งการที่รายงาน', 'รวมครั้งที่รายงาน'];
+      const h2 = ['', '', ''];
+      yms.forEach(ym => {
+        h1.push(ym.year !== prevY ? ym.year : '');
+        prevY = ym.year;
+        h2.push(ym.month);
+      });
+      lines.push(h1.join(','));
+      lines.push(h2.join(','));
+
+      activeData.ministries.forEach(min => {
+        const mRow = [`"${min.name}"`, min.policies, min.filteredReports];
+        yms.forEach(ym => mRow.push(min.filteredMonthly[ym.key] || ''));
+        lines.push(mRow.join(','));
+
+        min.filteredDepartments.forEach(d => {
+          const dRow = [`"${d.name}"`, d.policies, d.filteredReports];
+          yms.forEach(ym => dRow.push(d.filteredMonthly[ym.key] || ''));
+          lines.push(dRow.join(','));
+        });
+      });
+
+      const totRow = ['รวมทั้งหมด', activeData.totalPolicies, activeData.totalReports];
+      yms.forEach(ym => totRow.push(activeData.monthlyTotals[ym.key] || ''));
+      lines.push(totRow.join(','));
+
+      triggerDownload('\uFEFF' + lines.join('\n'), `PMONE-1020_${uiState.selectedGov}_${uiState.selectedYear}.csv`, 'text/csv;charset=utf-8;');
+    }
+
+    function exportFullJSON() {
+      const payload = JSON.stringify({
+        exportedAt: new Date().toISOString(),
+        governments: appData.governments,
+        tablesByGov: appData.tablesByGov
+      }, null, 2);
+      triggerDownload(payload, 'pm1_smart_dashboard_backup.json', 'application/json;charset=utf-8;');
+    }
+
+    function resetToFactoryData() {
+      localStorage.removeItem(STORAGE_KEY);
+      loadDatasetFromRawText(FACTORY_RAW_CSV, false);
+      updateStorageStatusBadge(false);
+      const msgEl = document.getElementById('importFeedbackMsg');
+      if (msgEl) msgEl.innerHTML = `<span class="text-blue-700 font-semibold">คืนค่าข้อมูลตั้งต้น PMONE-1020 เรียบร้อยแล้ว</span>`;
+    }
+
+    function triggerDownload(content, filename, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // =========================================================================
+    // 11. PRINT & PDF EXPORT STUDIO
+    // =========================================================================
+    function openPrintModal() {
+      const modal = document.getElementById('printModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closePrintModal() {
+      const modal = document.getElementById('printModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function executePrintReport() {
+      const title = (document.getElementById('pdfTitleInput') || {}).value || 'รายงานสรุปผลการดำเนินงานตามนโยบายรัฐบาลและข้อสั่งการนายกรัฐมนตรี (PM1)';
+      const mode = (document.getElementById('pdfContentMode') || {}).value || 'executivePack';
+
+      document.getElementById('printReportTitle').textContent = title;
+      document.getElementById('printReportDate').textContent = `วันที่ออกรายงาน: ${new Date().toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
+      const govLabel = uiState.selectedGov === 'ALL' ? 'ทุกรัฐบาล' : `รัฐบาล ${uiState.selectedGov}`;
+      const yearLabel = uiState.selectedYear === 'ALL' ? 'ทุกปี พ.ศ. (2566–2569)' : `ปี พ.ศ. ${uiState.selectedYear}`;
+      document.getElementById('printReportFilterSummary').textContent = `ตัวกรองข้อมูล: ${govLabel} | ${yearLabel}`;
+
+      const execSec = document.getElementById('executivePrintReportSection');
+      closePrintModal();
+
+      if (mode === 'executivePack' || mode === 'fullMinistryDept') {
+        buildExecutivePrintPack(mode);
+        execSec.classList.remove('hidden');
+        // Hide interactive tab views temporarily during print
+        ['overview', 'govCompare', 'ministryDrill', 'monthlyMatrix', 'dataManage'].forEach(t => {
+          document.getElementById(`view-${t}`).classList.add('hidden');
+        });
+        setTimeout(() => {
+          window.print();
+          execSec.classList.add('hidden');
+          switchTab(uiState.activeTab);
+        }, 180);
+      } else {
+        setTimeout(() => {
+          window.print();
+        }, 150);
+      }
+    }
+
+    function buildExecutivePrintPack(mode) {
+      const execSec = document.getElementById('executivePrintReportSection');
+      const activeData = getActiveTableData();
+      const comp = appData.comparisonMatrix;
+      if (!execSec || !activeData || !comp) return;
+
+      let html = `
+        <!-- Section 1: Government Comparison Summary Table -->
+        <div class="print-card p-4 rounded-xl border border-slate-300">
+          <h2 class="text-base font-bold text-slate-900 mb-2">1. ตารางสรุปเปรียบเทียบผลการดำเนินงานแยกตามรัฐบาล (${comp.governments.length} รัฐบาล)</h2>
+          <table class="w-full text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-900">
+                <th class="py-1.5 px-2 text-left">ลำดับ</th>
+                <th class="py-1.5 px-2 text-left">รัฐบาล</th>
+                <th class="py-1.5 px-2 text-right">จำนวนนโยบาย/ข้อสั่งการ</th>
+                <th class="py-1.5 px-2 text-right">รวมครั้งที่รายงาน</th>
+                <th class="py-1.5 px-2 text-right">สัดส่วน (%)</th>
+                <th class="py-1.5 px-2 text-right">ความถี่เฉลี่ย (ครั้ง/นโยบาย)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${comp.governments.map((g, i) => {
+                const tb = appData.tablesByGov[g];
+                const rep = comp.totalByGov[g] || 0;
+                const pol = tb ? tb.totalRow.policies : 0;
+                const pct = comp.grandTotal > 0 ? ((rep / comp.grandTotal) * 100).toFixed(1) : '0.0';
+                const ratio = pol > 0 ? (rep / pol).toFixed(2) : '0.00';
+                return `
+                  <tr>
+                    <td class="py-1.5 px-2">${i + 1}</td>
+                    <td class="py-1.5 px-2 font-semibold">รัฐบาล ${g}</td>
+                    <td class="py-1.5 px-2 text-right">${formatNumber(pol)}</td>
+                    <td class="py-1.5 px-2 text-right font-bold">${formatNumber(rep)}</td>
+                    <td class="py-1.5 px-2 text-right">${pct}%</td>
+                    <td class="py-1.5 px-2 text-right">${ratio}</td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+            <tfoot>
+              <tr class="bg-slate-100 font-bold">
+                <td colspan="2" class="py-1.5 px-2">รวมทั้งสิ้น</td>
+                <td class="py-1.5 px-2 text-right">${formatNumber(appData.tablesByGov['ALL'] ? appData.tablesByGov['ALL'].totalRow.policies : activeData.totalPolicies)}</td>
+                <td class="py-1.5 px-2 text-right">${formatNumber(comp.grandTotal)}</td>
+                <td class="py-1.5 px-2 text-right">100.0%</td>
+                <td class="py-1.5 px-2 text-right">-</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Section 2: Cross-Government Matrix by Ministry -->
+        <div class="print-card p-4 rounded-xl border border-slate-300 mt-4">
+          <h2 class="text-base font-bold text-slate-900 mb-2">2. ตารางเปรียบเทียบจำนวนครั้งที่รายงานผลนโยบาย แยกตามกระทรวงและรัฐบาล (ครบ 27 กระทรวงหลัก)</h2>
+          <table class="w-full text-xs border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-900">
+                <th class="py-1 px-2 text-left">ลำดับ</th>
+                <th class="py-1 px-2 text-left">กระทรวง / หน่วยงานหลัก</th>
+                ${comp.governments.map(g => `<th class="py-1 px-2 text-right">${g}</th>`).join('')}
+                <th class="py-1 px-2 text-right font-bold">รวม</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${comp.rows.map((r, idx) => `
+                <tr>
+                  <td class="py-1 px-2">${idx + 1}</td>
+                  <td class="py-1 px-2 font-semibold">${r.ministry}</td>
+                  ${comp.governments.map(g => `<td class="py-1 px-2 text-right">${r.byGov[g] ? formatNumber(r.byGov[g]) : '-'}</td>`).join('')}
+                  <td class="py-1 px-2 text-right font-bold">${formatNumber(r.total)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+
+      if (mode === 'fullMinistryDept') {
+        html += `
+          <div class="print-page-break print-card p-4 rounded-xl border border-slate-300 mt-4">
+            <h2 class="text-base font-bold text-slate-900 mb-2">3. รายละเอียดระดับกระทรวงและกรมย่อย (${uiState.selectedGov === 'ALL' ? 'ทุกรัฐบาล' : uiState.selectedGov})</h2>
+            <table class="w-full text-xs border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-slate-900">
+                  <th class="py-1 px-2 text-left">กระทรวง / กรมในสังกัด</th>
+                  <th class="py-1 px-2 text-right">จำนวนนโยบาย</th>
+                  <th class="py-1 px-2 text-right">รวมครั้งที่รายงาน</th>
+                  <th class="py-1 px-2 text-right">ความถี่ (ครั้ง/นโยบาย)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${activeData.ministries.map(m => `
+                  <tr class="bg-slate-100 font-bold">
+                    <td class="py-1 px-2">${m.name}</td>
+                    <td class="py-1 px-2 text-right">${formatNumber(m.policies)}</td>
+                    <td class="py-1 px-2 text-right">${formatNumber(m.filteredReports)}</td>
+                    <td class="py-1 px-2 text-right">${m.policies > 0 ? (m.filteredReports / m.policies).toFixed(2) : '-'}</td>
+                  </tr>
+                  ${m.filteredDepartments.map(d => `
+                    <tr>
+                      <td class="py-1 pl-6 pr-2">↳ ${d.name}</td>
+                      <td class="py-1 px-2 text-right">${formatNumber(d.policies)}</td>
+                      <td class="py-1 px-2 text-right">${formatNumber(d.filteredReports)}</td>
+                      <td class="py-1 px-2 text-right">${d.policies > 0 ? (d.filteredReports / d.policies).toFixed(2) : '-'}</td>
+                    </tr>
+                  `).join('')}
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      execSec.innerHTML = html;
+    }
+
+    // =========================================================================
+    // 12. NAVIGATION & INITIALIZATION CONTROLLER
+    // =========================================================================
+    function switchTab(tabId) {
+      uiState.activeTab = tabId;
+      const tabs = ['overview', 'govCompare', 'ministryDrill', 'monthlyMatrix', 'dataManage'];
+      tabs.forEach(t => {
+        const sec = document.getElementById(`view-${t}`);
+        const btn = document.getElementById(`tabBtn-${t}`);
+        if (sec) {
+          if (t === tabId) sec.classList.remove('hidden');
+          else sec.classList.add('hidden');
+        }
+        if (btn) {
+          btn.className = t === tabId
+            ? 'tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-blue-600 text-white shadow-sm transition cursor-pointer'
+            : 'tab-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-medium text-blue-100 hover:bg-white/10 transition cursor-pointer';
+        }
+      });
+      refreshAllViews();
+    }
+
+    function onGlobalFilterChange() {
+      uiState.selectedGov = (document.getElementById('globalGovFilter') || {}).value || 'ALL';
+      uiState.selectedYear = (document.getElementById('globalYearFilter') || {}).value || 'ALL';
+      uiState.selectedMinistry = (document.getElementById('globalMinistryFilter') || {}).value || 'ALL';
+      uiState.searchQuery = (document.getElementById('globalSearchInput') || {}).value || '';
+
+      if (uiState.selectedMinistry !== 'ALL') {
+        uiState.drillMinistry = uiState.selectedMinistry;
+        const drillSel = document.getElementById('drillMinistrySelect');
+        if (drillSel) drillSel.value = uiState.drillMinistry;
+      }
+      refreshAllViews();
+    }
+
+    function resetAllFilters() {
+      uiState.selectedGov = 'ALL';
+      uiState.selectedYear = 'ALL';
+      uiState.selectedMinistry = 'ALL';
+      uiState.searchQuery = '';
+      document.getElementById('globalGovFilter').value = 'ALL';
+      document.getElementById('globalYearFilter').value = 'ALL';
+      document.getElementById('globalMinistryFilter').value = 'ALL';
+      document.getElementById('globalSearchInput').value = '';
+      refreshAllViews();
+    }
+
+    function refreshAllViews() {
+      const activeData = getActiveTableData();
+      if (!activeData) return;
+
+      renderKPIStrip(activeData);
+
+      if (uiState.activeTab === 'overview') {
+        renderSmartInsights(activeData);
+        renderTimelineChart(activeData);
+        renderOverviewCharts();
+      } else if (uiState.activeTab === 'govCompare') {
+        renderGovComparisonTab();
+      } else if (uiState.activeTab === 'ministryDrill') {
+        renderMinistryDrillTab();
+      } else if (uiState.activeTab === 'monthlyMatrix') {
+        renderMonthlyMatrixTable();
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      // Load from LocalStorage if user previously imported custom data, else use FACTORY_RAW_CSV
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          const parsedSaved = JSON.parse(saved);
+          if (parsedSaved && parsedSaved.governments && parsedSaved.tablesByGov) {
+            appData.governments = parsedSaved.governments;
+            appData.tablesByGov = parsedSaved.tablesByGov;
+            rebuildDerivedAggregates();
+            populateFilterDropdowns();
+            updateStorageStatusBadge(true);
+            refreshAllViews();
+            return;
+          }
+        } catch (e) {
+          console.warn('Fallback to factory dataset:', e);
+        }
+      }
+      loadDatasetFromRawText(FACTORY_RAW_CSV, false);
+      updateStorageStatusBadge(false);
+    });
+  </script>
+</body>
+</html>
